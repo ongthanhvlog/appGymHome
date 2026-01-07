@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#F5F5F5"
+    android:padding="24dp">
+
+    <!-- TIÊU ĐỀ -->
+    <TextView
+        android:id="@+id/tvTieuDeDangKy"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="ĐĂNG KÝ"
+        android:textSize="30sp"
+        android:textStyle="bold"
+        android:textColor="#212121"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="40dp"/>
+
+    <!-- MÔ TẢ -->
+    <TextView
+        android:id="@+id/tvMoTaDangKy"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Tạo tài khoản để bắt đầu tập luyện"
+        android:textSize="14sp"
+        android:textColor="#757575"
+        app:layout_constraintTop_toBottomOf="@id/tvTieuDeDangKy"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="12dp"/>
+
+    <!-- EMAIL -->
+    <EditText
+        android:id="@+id/edtEmail"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:hint="Email"
+        android:inputType="textEmailAddress"
+        android:padding="14dp"
+        android:background="@android:drawable/edit_text"
+        app:layout_constraintTop_toBottomOf="@id/tvMoTaDangKy"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="32dp"/>
+
+    <!-- MẬT KHẨU -->
+    <EditText
+        android:id="@+id/edtMatKhau"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:hint="Mật khẩu"
+        android:inputType="textPassword"
+        android:padding="14dp"
+        android:background="@android:drawable/edit_text"
+        app:layout_constraintTop_toBottomOf="@id/edtEmail"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="16dp"/>
+
+    <!-- NHẬP LẠI MẬT KHẨU -->
+    <EditText
+        android:id="@+id/edtNhapLaiMatKhau"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:hint="Nhập lại mật khẩu"
+        android:inputType="textPassword"
+        android:padding="14dp"
+        android:background="@android:drawable/edit_text"
+        app:layout_constraintTop_toBottomOf="@id/edtMatKhau"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="16dp"/>
+
+    <!-- NÚT ĐĂNG KÝ -->
+    <Button
+        android:id="@+id/btnDangKy"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:text="ĐĂNG KÝ"
+        android:textSize="16sp"
+        android:textAllCaps="false"
+        android:textColor="#FFFFFF"
+        android:backgroundTint="#1976D2"
+        app:layout_constraintTop_toBottomOf="@id/edtNhapLaiMatKhau"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="32dp"/>
+
+    <!-- QUAY LẠI ĐĂNG NHẬP -->
+    <TextView
+        android:id="@+id/tvQuayLaiDangNhap"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Đã có tài khoản? Đăng nhập"
+        android:textSize="14sp"
+        android:textColor="#1976D2"
+        app:layout_constraintTop_toBottomOf="@id/btnDangKy"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="20dp"/>
+
+    <!-- GỬI LẠI EMAIL XÁC NHẬN -->
+    <TextView
+        android:id="@+id/tvGuiLaiEmail"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Gửi lại email xác nhận"
+        android:textSize="14sp"
+        android:textColor="#D32F2F"
+        app:layout_constraintTop_toBottomOf="@id/tvQuayLaiDangNhap"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:layout_marginTop="16dp"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

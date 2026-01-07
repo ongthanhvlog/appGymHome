@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1042557616594",
+    "project_id": "gymhome-4953",
+    "storage_bucket": "gymhome-4953.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1042557616594:android:046069d57d12d77801c80b",
+        "android_client_info": {
+          "package_name": "com.example.gymhome"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC_zEFn_LZ9N8LqtT2JDGsxwpj_VqPwako"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
