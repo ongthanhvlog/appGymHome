@@ -2,6 +2,12 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <uses-permission android:name="android.permission.CAMERA" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" /> <!-- 🔹 KHAI BÁO KHÔNG BẮT BUỘC CÓ CAMERA -->
+    <uses-feature
+        android:name="android.hardware.camera"
+        android:required="false" />
+
     <application
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
@@ -11,29 +17,33 @@
         android:roundIcon="@mipmap/appicon"
         android:supportsRtl="true"
         android:theme="@style/Theme.GymHome">
-
-        <!-- MAIN (SAU KHI LOGIN) -->
+        <activity
+            android:name=".kehoachthang.BaiTapCon"
+            android:exported="false" />
+        <activity
+            android:name=".kehoachthang.BaiTapNgay"
+            android:exported="false" />
+        <activity
+            android:name=".vungtapchung.BaiTap_CardView"
+            android:exported="false" />
+        <activity
+            android:name=".vungtapchung.VungTapChung_CardView"
+            android:exported="false" /> <!-- MAIN (SAU KHI LOGIN) -->
         <activity
             android:name=".MainActivity"
-            android:exported="false" />
-
-        <!-- REGISTER -->
+            android:exported="false" /> <!-- REGISTER -->
         <activity
             android:name=".Register"
-            android:exported="false" />
-
-        <!-- LOGIN (MỞ APP ĐẦU TIÊN) -->
+            android:exported="false" /> <!-- LOGIN (MỞ APP ĐẦU TIÊN) -->
         <activity
             android:name=".Login"
             android:exported="true">
-
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-
         </activity>
-
     </application>
 
 </manifest>

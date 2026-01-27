@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white">
+
+    <TextView
+        android:id="@+id/tvTieuDeDinhDuong"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="44dp"
+        android:text="Trò chuyện cùng AI"
+        android:textSize="22sp"
+        android:textStyle="bold"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <LinearLayout
+        android:id="@+id/layout_goi_y"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="260dp"
+        android:gravity="center"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toTopOf="@id/imgHinhAnh"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.492"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tvTieuDeDinhDuong">
+
+        <ImageView
+            android:layout_width="80dp"
+            android:layout_height="83dp"
+            android:src="@drawable/ic_hello" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:text="Trò chuyện với tôi ngay lập tức"
+            android:textSize="16sp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:gravity="center"
+            android:text="Chụp ảnh hoặc nhập món ăn để tính calo và dinh dưỡng"
+            android:textSize="14sp" />
+    </LinearLayout>
+
+    <ImageView
+        android:id="@+id/imgHinhAnh"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:maxHeight="260dp"
+        android:layout_margin="12dp"
+        android:adjustViewBounds="true"
+        android:scaleType="fitCenter"
+        app:layout_constraintBottom_toTopOf="@id/input_layout"
+        app:layout_constraintStart_toStartOf="parent"
+        android:layout_marginStart="12dp"/>
+
+    <LinearLayout
+        android:id="@+id/input_layout"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:padding="8dp"
+        android:background="@android:drawable/editbox_background"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
+
+        <EditText
+            android:id="@+id/edtNhapNoiDung"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@null"
+            android:hint="Bạn đã ăn gì hoặc tập thể dục?"
+            android:padding="8dp"
+            android:inputType="textMultiLine|textCapSentences"/>
+
+        <ImageView
+            android:id="@+id/ic_image"
+            android:layout_width="28dp"
+            android:layout_height="28dp"
+            android:layout_marginEnd="8dp"
+            android:src="@drawable/ic_image"/>
+
+        <ImageView
+            android:id="@+id/ic_camera"
+            android:layout_width="28dp"
+            android:layout_height="28dp"
+            android:layout_marginEnd="8dp"
+            android:src="@drawable/ic_camera"/>
+
+        <Button
+            android:id="@+id/btnGui"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Gửi"/>
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

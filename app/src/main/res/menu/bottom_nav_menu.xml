@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/menu_home"
+        android:icon="@drawable/ic_trangchu"
+        android:title="Trang chủ" />
+
+    <item
+        android:id="@+id/menu_workout"
+        android:icon="@drawable/ic_tapluyen"
+        android:title="Tập luyện" />
+
+    <item
+        android:id="@+id/menu_nutrition"
+        android:icon="@drawable/ic_dinhduong"
+        android:title="Dinh dưỡng" />
+
+    <item
+        android:id="@+id/menu_report"
+        android:icon="@drawable/ic_baocao"
+        android:title="Báo cáo" />
+
+    <item
+        android:id="@+id/menu_profile"
+        android:icon="@drawable/ic_canhan"
+        android:title="Cá nhân" />
+
+</menu>
