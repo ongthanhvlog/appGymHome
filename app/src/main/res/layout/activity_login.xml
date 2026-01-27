@@ -36,7 +36,7 @@
         android:id="@+id/tvMotivation"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="30 Ngày\nThay đổi con người bạn"
+        android:text="30 Ngày\nThay đổi ngoại hình bạn"
         android:textAlignment="center"
         android:textColor="#1976D2"
         android:textSize="26sp"
