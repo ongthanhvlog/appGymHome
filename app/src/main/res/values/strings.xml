@@ -1,5 +1,9 @@
 <resources>
     <string name="app_name">GymHome</string>
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="thong_bao_bat_lap_lai">Đã bật lặp lại bài tập</string>
+    <string name="thong_bao_tat_lap_lai">Đã tắt lặp lại bài tập</string>
+    <string name="tien_do_bai_tap">Bài tập: %1$d/%2$d</string>
+    <string name="loi_video">Link video bị lỗi hoặc không tồn tại</string>
+    <string name="hoan_thanh_buoi_tap">Chúc mừng! Bạn đã hoàn thành buổi tập!</string>
+    <string name="huong_dan_thuc_hien">Hướng dẫn thực hiện</string>
 </resources>
