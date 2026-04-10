@@ -2,8 +2,10 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools">
 
+    <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.CAMERA" />
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" /> <!-- 🔹 KHAI BÁO KHÔNG BẮT BUỘC CÓ CAMERA -->
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+
     <uses-feature
         android:name="android.hardware.camera"
         android:required="false" />
@@ -12,31 +14,36 @@
         android:allowBackup="true"
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:fullBackupContent="@xml/backup_rules"
+        android:hardwareAccelerated="true"
+        android:usesCleartextTraffic="true"
         android:icon="@mipmap/appicon"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/appicon"
         android:supportsRtl="true"
         android:theme="@style/Theme.GymHome">
         <activity
-            android:name=".kehoachthang.BaiTapCon"
+            android:name=".activity.DangKyBaiTapLon"
             android:exported="false" />
         <activity
-            android:name=".kehoachthang.BaiTapNgay"
+            android:name=".activity.VungTapTrung"
             android:exported="false" />
         <activity
-            android:name=".vungtapchung.BaiTap_CardView"
+            android:name=".activity.DanhSachBaiTapLon"
             android:exported="false" />
         <activity
-            android:name=".vungtapchung.VungTapChung_CardView"
-            android:exported="false" /> <!-- MAIN (SAU KHI LOGIN) -->
+            android:name=".activity.BaiTapNho"
+            android:exported="false" />
         <activity
-            android:name=".MainActivity"
-            android:exported="false" /> <!-- REGISTER -->
+            android:name=".activity.DanhSachBaiTapNho"
+            android:exported="false" />
         <activity
-            android:name=".Register"
-            android:exported="false" /> <!-- LOGIN (MỞ APP ĐẦU TIÊN) -->
+            android:name=".activity.MainActivity"
+            android:exported="false" />
         <activity
-            android:name=".Login"
+            android:name=".activity.Register"
+            android:exported="false" />
+        <activity
+            android:name=".activity.Login"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
