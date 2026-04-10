@@ -40,6 +40,12 @@
             android:name=".activity.MainActivity"
             android:exported="false" />
         <activity
+            android:name=".activity.DanhSachThuThach"
+            android:exported="false" />
+        <activity
+            android:name=".activity.ChiTietThuThach"
+            android:exported="false" />
+        <activity
             android:name=".activity.Register"
             android:exported="false" />
         <activity

@@ -1,6 +1,8 @@
 package com.example.gymhome.model;
 
-public class Ngay {
+import java.io.Serializable;
+
+public class Ngay implements Serializable {
     private String Id;
     private int TongThoiGian;
     private int SoLuongBaiTapLon;

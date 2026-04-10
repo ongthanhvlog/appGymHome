@@ -2,46 +2,43 @@ package com.example.gymhome.model;
 
 import java.io.Serializable;
 
-public class BaiTapNho implements Serializable {
-    private String Id;
-    private String TenBaiTapNho;
+public class ThuThach implements Serializable {
+    private String ThuThachId;
+    private String TenThuThach;
     private String MoTa;
     private int ThoiGian;
-    private int SoThuTu;
+    private String CapDo;
     private String VideoHuongDan;
     private String VideoType;
     private String HinhAnh;
-
-    public BaiTapNho() {
+    public ThuThach() {
     }
-
-    // Constructor
-    public BaiTapNho(String id, String tenBaiTapNho, String moTa, int thoiGian, int soThuTu, String videoHuongDan, String videoType, String hinhAnh) {
-        this.Id = id;
-        this.TenBaiTapNho = tenBaiTapNho;
+    //Contructor
+    public ThuThach(String thuThachId, String tenThuThach, String moTa, int thoiGian, String capDo, String videoHuongDan, String videoType, String hinhAnh){
+        this.ThuThachId = thuThachId;
+        this.TenThuThach = tenThuThach;
         this.MoTa = moTa;
         this.ThoiGian = thoiGian;
-        this.SoThuTu = soThuTu;
+        this.CapDo = capDo;
         this.VideoHuongDan = videoHuongDan;
         this.VideoType = videoType;
         this.HinhAnh = hinhAnh;
     }
-
     // Getter và Setter
     public String getId() {
-        return Id;
+        return ThuThachId;
     }
 
     public void setId(String id) {
-        Id = id;
+        ThuThachId = id;
     }
 
-    public String getTenBaiTapNho() {
-        return TenBaiTapNho;
+    public String getTenThuThach() {
+        return TenThuThach;
     }
 
-    public void setTenBaiTapNho(String tenBaiTapNho) {
-        TenBaiTapNho = tenBaiTapNho;
+    public void setTenThuThach(String tenThuThach) {
+        TenThuThach = tenThuThach;
     }
 
     public String getMoTa() {
@@ -60,13 +57,11 @@ public class BaiTapNho implements Serializable {
         ThoiGian = thoiGian;
     }
 
-    public int getSoThuTu() {
-        return SoThuTu;
+    public String getCapDo() {
+        return CapDo;
     }
 
-    public void setSoThuTu(int soThuTu) {
-        SoThuTu = soThuTu;
-    }
+    public void setCapDo(String capDo) { CapDo = capDo; }
 
     public String getVideoHuongDan() {
         return VideoHuongDan;

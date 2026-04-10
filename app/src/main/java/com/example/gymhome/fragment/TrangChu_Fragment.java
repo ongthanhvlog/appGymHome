@@ -10,10 +10,14 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.gymhome.R;
+import com.example.gymhome.activity.DanhSachThuThach;
+import com.example.gymhome.adapter.ThuThachAdapter;
 import com.example.gymhome.adapter.VungTapTrungAdapter;
+import com.example.gymhome.model.ThuThach;
 import com.example.gymhome.model.VungTapTrung;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
@@ -23,10 +27,13 @@ import java.util.List;
 
 public class TrangChu_Fragment extends Fragment {
 
-    private RecyclerView rvVungTapTrung;
+    private RecyclerView rvVungTapTrung, rvThuThachTrangChu;
     private VungTapTrungAdapter adapter;
+    private ThuThachAdapter thuThachAdapter;
     private List<VungTapTrung> vungTapTrungList;
+    private List<ThuThach> thuThachList;
     private FirebaseFirestore db;
+    private TextView tvXemTatCaThuThach;
 
     public TrangChu_Fragment() {
         // Required empty public constructor
@@ -40,6 +47,7 @@ public class TrangChu_Fragment extends Fragment {
 
         db = FirebaseFirestore.getInstance();
 
+        // Vùng tập trung
         rvVungTapTrung = view.findViewById(R.id.rvVungTapTrung);
         rvVungTapTrung.setLayoutManager(new GridLayoutManager(getContext(), 2));
 
@@ -53,10 +61,44 @@ public class TrangChu_Fragment extends Fragment {
             startActivity(intent);
         });
         rvVungTapTrung.setAdapter(adapter);
+        rvThuThachTrangChu = view.findViewById(R.id.rvThuThach);
+        rvThuThachTrangChu.setLayoutManager(new androidx.recyclerview.widget.LinearLayoutManager(getContext()));
+        rvThuThachTrangChu.setNestedScrollingEnabled(false);
+        
+        thuThachList = new ArrayList<>();
+        thuThachAdapter = new ThuThachAdapter(thuThachList, item -> {
+            Intent intent = new Intent(getActivity(), com.example.gymhome.activity.ChiTietThuThach.class);
+            intent.putExtra("ThuThachData", item);
+            startActivity(intent);
+        });
+        rvThuThachTrangChu.setAdapter(thuThachAdapter);
+        tvXemTatCaThuThach = view.findViewById(R.id.tvXemTatCaThuThach);
+        tvXemTatCaThuThach.setOnClickListener(v -> {
+            Intent intent = new Intent(getActivity(), DanhSachThuThach.class);
+            startActivity(intent);
+        });
 
         loadVungTapTrungData();
+        loadThuThachData();
 
         return view;
+    }
+
+    private void loadThuThachData() {
+        db.collection("ThuThach")
+                .limit(2)
+                .get()
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        thuThachList.clear();
+                        for (QueryDocumentSnapshot document : task.getResult()) {
+                            ThuThach item = document.toObject(ThuThach.class);
+                            item.setId(document.getId());
+                            thuThachList.add(item);
+                        }
+                        thuThachAdapter.notifyDataSetChanged();
+                    }
+                });
     }
 
     private void loadVungTapTrungData() {
