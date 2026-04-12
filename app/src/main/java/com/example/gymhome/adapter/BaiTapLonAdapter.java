@@ -20,6 +20,7 @@ public class BaiTapLonAdapter extends RecyclerView.Adapter<BaiTapLonAdapter.View
     private OnItemClickListener listener;
     private OnCancelClickListener cancelListener;
     private boolean isShowCancelButton = false;
+    private double canNang;
 
     public interface OnItemClickListener {
         void onItemClick(BaiTapLon item);
@@ -29,10 +30,14 @@ public class BaiTapLonAdapter extends RecyclerView.Adapter<BaiTapLonAdapter.View
         void onCancelClick(BaiTapLon item);
     }
 
-    // Constructor
-    public BaiTapLonAdapter(List<BaiTapLon> danhSachBaiTapLon, OnItemClickListener listener) {
+    public BaiTapLonAdapter(List<BaiTapLon> danhSachBaiTapLon, double canNang, OnItemClickListener listener) {
         this.danhSachBaiTapLon = danhSachBaiTapLon;
+        this.canNang = canNang;
         this.listener = listener;
+    }
+
+    public BaiTapLonAdapter(List<BaiTapLon> danhSachBaiTapLon, OnItemClickListener listener) {
+        this(danhSachBaiTapLon, 0.0, listener);
     }
 
     public void setOnCancelClickListener(OnCancelClickListener cancelListener) {
@@ -40,10 +45,14 @@ public class BaiTapLonAdapter extends RecyclerView.Adapter<BaiTapLonAdapter.View
         this.isShowCancelButton = true;
     }
 
+    public void setCanNang(double canNang) {
+        this.canNang = canNang;
+        notifyDataSetChanged();
+    }
+
     @NonNull
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        // Ánh xạ layout item_baitaplon vào Adapter
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_baitaplon, parent, false);
         return new ViewHolder(view);
     }
@@ -54,6 +63,9 @@ public class BaiTapLonAdapter extends RecyclerView.Adapter<BaiTapLonAdapter.View
         holder.tvTen.setText(item.getTenBaiTapLon());
         holder.tvCapDo.setText(item.getCapDo());
         holder.tvThoiGian.setText(item.getThoiGian());
+
+        double calo = item.tinhTongCalo(canNang);
+        holder.tvCalo.setText(String.format("%.1f kcal", calo));
 
         // Sử dụng thư viện Glide để load hình ảnh từ link
         Glide.with(holder.itemView.getContext())
@@ -81,7 +93,7 @@ public class BaiTapLonAdapter extends RecyclerView.Adapter<BaiTapLonAdapter.View
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         ImageView ivHinhAnh, btnHuy;
-        TextView tvTen, tvCapDo, tvThoiGian;
+        TextView tvTen, tvCapDo, tvThoiGian, tvCalo;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -90,6 +102,7 @@ public class BaiTapLonAdapter extends RecyclerView.Adapter<BaiTapLonAdapter.View
             tvTen = itemView.findViewById(R.id.tvTenBaiTapLon);
             tvCapDo = itemView.findViewById(R.id.tvCapDo);
             tvThoiGian = itemView.findViewById(R.id.tvTongThoiGian);
+            tvCalo = itemView.findViewById(R.id.tvCalo);
         }
     }
 }

@@ -19,14 +19,21 @@ public class BaiTapNhoAdapter extends RecyclerView.Adapter<BaiTapNhoAdapter.View
 
     private List<BaiTapNho> danhSachBaiTapNho;
     private OnItemClickListener listener;
+    private double canNang;
 
     public interface OnItemClickListener {
         void onItemClick(BaiTapNho item);
     }
 
-    public BaiTapNhoAdapter(List<BaiTapNho> danhSachBaiTapNho, OnItemClickListener listener) {
+    public BaiTapNhoAdapter(List<BaiTapNho> danhSachBaiTapNho, double canNang, OnItemClickListener listener) {
         this.danhSachBaiTapNho = danhSachBaiTapNho;
+        this.canNang = canNang;
         this.listener = listener;
+    }
+
+    public void setCanNang(double canNang) {
+        this.canNang = canNang;
+        notifyDataSetChanged();
     }
 
     @NonNull
@@ -42,7 +49,13 @@ public class BaiTapNhoAdapter extends RecyclerView.Adapter<BaiTapNhoAdapter.View
         holder.tvTen.setText(item.getTenBaiTapNho());
         
         int thoiGian = item.getThoiGian();
-        holder.tvThoiGian.setText(thoiGian + " giây");
+        int soPhut = thoiGian / 60;
+        holder.tvThoiGian.setText(soPhut + " phút");
+
+        // calo = MET * Cân nặng * Thời gian (giờ)
+        double met = item.getMET();
+        double calo = met * canNang * (thoiGian / 3600.0);
+        holder.tvCalo.setText(String.format("%.1f kcal", calo));
 
         Glide.with(holder.itemView.getContext())
                 .load(item.getHinhAnh())
@@ -59,13 +72,14 @@ public class BaiTapNhoAdapter extends RecyclerView.Adapter<BaiTapNhoAdapter.View
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         ImageView ivHinhAnh;
-        TextView tvTen, tvThoiGian;
+        TextView tvTen, tvThoiGian, tvCalo;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             ivHinhAnh = itemView.findViewById(R.id.imgHinhAnhBaiTapNho);
             tvTen = itemView.findViewById(R.id.tvTenBaiTapNho);
             tvThoiGian = itemView.findViewById(R.id.tvThoiGian);
+            tvCalo = itemView.findViewById(R.id.tvCalo);
         }
     }
 }

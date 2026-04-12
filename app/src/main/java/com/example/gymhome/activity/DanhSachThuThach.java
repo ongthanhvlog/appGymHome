@@ -15,6 +15,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.gymhome.R;
 import com.example.gymhome.adapter.ThuThachAdapter;
 import com.example.gymhome.model.ThuThach;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
@@ -25,17 +26,17 @@ public class DanhSachThuThach extends AppCompatActivity {
 
     private RecyclerView rvTatCaThuThach;
     private ThuThachAdapter adapter;
-    private List<ThuThach> list;
+    private List<ThuThach> danhSachThuThach;
     private FirebaseFirestore db;
     private ImageButton ibQuayLai;
+    private double canNang = 0.0; 
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.dsthuthach);
-        
-        // Xử lý Edge-to-Edge để giao diện không bị đè bởi thanh hệ thống
+
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
@@ -46,23 +47,24 @@ public class DanhSachThuThach extends AppCompatActivity {
         ibQuayLai = findViewById(R.id.ibQuayLai);
         rvTatCaThuThach = findViewById(R.id.rvTatCaThuThach);
 
-        // Nút quay lại hoạt động tương tự dsbaitaplon
         ibQuayLai.setOnClickListener(v -> finish());
-
         db = FirebaseFirestore.getInstance();
         rvTatCaThuThach.setLayoutManager(new LinearLayoutManager(this));
-
-        list = new ArrayList<>();
-        adapter = new ThuThachAdapter(list, item -> {
-            // Mở màn hình chi tiết thử thách
+        danhSachThuThach = new ArrayList<>();
+        loadCanNangNguoiDung();
+        adapter = new ThuThachAdapter(danhSachThuThach, canNang, item -> {
             android.content.Intent intent = new android.content.Intent(DanhSachThuThach.this, ChiTietThuThach.class);
             intent.putExtra("ThuThachData", item);
             startActivity(intent);
         });
-
         rvTatCaThuThach.setAdapter(adapter);
-
         loadAllThuThach();
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        loadCanNangNguoiDung();
     }
 
     private void loadAllThuThach() {
@@ -70,15 +72,33 @@ public class DanhSachThuThach extends AppCompatActivity {
                 .get()
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {
-                        list.clear();
+                        danhSachThuThach.clear();
                         for (QueryDocumentSnapshot document : task.getResult()) {
                             ThuThach item = document.toObject(ThuThach.class);
                             item.setId(document.getId());
-                            list.add(item);
+                            danhSachThuThach.add(item);
                         }
                         adapter.notifyDataSetChanged();
                     } else {
                         Toast.makeText(this, "Lỗi tải dữ liệu: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                });
+    }
+
+    private void loadCanNangNguoiDung() {
+        String userId = FirebaseAuth.getInstance().getUid();
+        if (userId == null) return;
+
+        db.collection("NguoiDung").document(userId).get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    if (documentSnapshot.exists()) {
+                        Double canNangVal = documentSnapshot.getDouble("ThongTinNguoiDung.CanNang");
+                        if (canNangVal != null) {
+                            this.canNang = canNangVal;
+                            if (adapter != null) {
+                                adapter.setCanNang(this.canNang);
+                            }
+                        }
                     }
                 });
     }

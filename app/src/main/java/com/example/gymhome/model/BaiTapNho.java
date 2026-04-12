@@ -7,6 +7,7 @@ public class BaiTapNho implements Serializable {
     private String TenBaiTapNho;
     private String MoTa;
     private int ThoiGian;
+    private double MET;
     private int SoThuTu;
     private String VideoHuongDan;
     private String VideoType;
@@ -58,6 +59,14 @@ public class BaiTapNho implements Serializable {
 
     public void setThoiGian(int thoiGian) {
         ThoiGian = thoiGian;
+    }
+
+    public double getMET() {
+        return MET;
+    }
+
+    public void setMET(double MET) {
+        this.MET = MET;
     }
 
     public int getSoThuTu() {

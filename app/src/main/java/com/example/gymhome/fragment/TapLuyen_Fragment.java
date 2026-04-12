@@ -41,19 +41,18 @@ public class TapLuyen_Fragment extends Fragment {
     private List<BaiTapLon> danhSachBaiTapDaDangKy;
     private FirebaseFirestore db;
     private String phanLoai = "NguoiMoiBatDau";
+    private double canNang = 0.0;
 
     public TapLuyen_Fragment() {
-        // Required empty public constructor
     }
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.tapluyen, container, false);
-
         db = FirebaseFirestore.getInstance();
 
-        // Ánh xạ View
+        // anh xa view
         tabNguoiMoiBatDau = view.findViewById(R.id.tabNguoiMoiBatDau);
         tabNangCao = view.findViewById(R.id.tabNangCao);
         tabBaiTapDaDangKy = view.findViewById(R.id.tabBaiTapDaDangKy);
@@ -63,8 +62,6 @@ public class TapLuyen_Fragment extends Fragment {
         // Ánh xạ RecyclerView cho bài tập đã đăng ký
         rvBaiTapDaDangKy = view.findViewById(R.id.rvBaiTapDaDangKy);
         if (rvBaiTapDaDangKy == null) {
-            // Nếu chưa có trong layout thì chúng ta sẽ xử lý sau hoặc giả định nó tồn tại trong baitapdadangky
-            // Ở đây tôi sẽ tìm trong viewBaiTapDaDangKy nếu nó là một layout chứa RV
             rvBaiTapDaDangKy = viewBaiTapDaDangKy.findViewById(R.id.rvBaiTapDaDangKy);
         }
 
@@ -72,7 +69,6 @@ public class TapLuyen_Fragment extends Fragment {
         danhSachNgay = new ArrayList<>();
         rvNgay.setLayoutManager(new LinearLayoutManager(getContext()));
         adapter = new NgayAdapter(danhSachNgay, item -> {
-            // Chuyển sang danh sách bài tập của ngày đó
             Intent intent = new Intent(getActivity(), DanhSachBaiTapLon.class);
             intent.putExtra("NgayId", item.getId());
             intent.putExtra("CapDo", phanLoai);
@@ -91,16 +87,16 @@ public class TapLuyen_Fragment extends Fragment {
                 intent.putExtra("TenBaiTapLon", item.getTenBaiTapLon());
                 intent.putExtra("MoTa", item.getMoTa());
                 intent.putExtra("HinhAnh", item.getHinhAnh());
-                intent.putExtra("isRegistered", true); // Quan trọng để load đúng collection
+                intent.putExtra("isRegistered", true);
                 startActivity(intent);
             });
             daDangKyAdapter.setOnCancelClickListener(item -> {
-                showConfirmHuyDangKyDialog(item);
+                hienThiDialogXacNhanHuyDangKy(item);
             });
             rvBaiTapDaDangKy.setAdapter(daDangKyAdapter);
         }
 
-        // Mặc định chọn tab Người mới
+        loadCanNangNguoiDung();
         selectTab(tabNguoiMoiBatDau);
 
         // Xử lý click
@@ -118,7 +114,6 @@ public class TapLuyen_Fragment extends Fragment {
     }
 
     private void selectTab(TextView selectedTab) {
-        // Reset giao diện các tab
         tabNguoiMoiBatDau.setSelected(false);
         tabNguoiMoiBatDau.setBackground(null);
         tabNangCao.setSelected(false);
@@ -126,7 +121,6 @@ public class TapLuyen_Fragment extends Fragment {
         tabBaiTapDaDangKy.setSelected(false);
         tabBaiTapDaDangKy.setBackground(null);
 
-        // Active tab được chọn
         selectedTab.setSelected(true);
         selectedTab.setBackground(ContextCompat.getDrawable(requireContext(), R.drawable.tab_selected_bg));
 
@@ -141,7 +135,7 @@ public class TapLuyen_Fragment extends Fragment {
         }
     }
 
-    private void showConfirmHuyDangKyDialog(BaiTapLon item) {
+    private void hienThiDialogXacNhanHuyDangKy(BaiTapLon item) {
         new android.app.AlertDialog.Builder(getContext())
                 .setTitle("Xác nhận hủy đăng ký")
                 .setMessage("Bạn có muốn hủy đăng ký bài tập lớn \"" + item.getTenBaiTapLon() + "\" không?")
@@ -163,10 +157,32 @@ public class TapLuyen_Fragment extends Fragment {
                 .delete()
                 .addOnSuccessListener(aVoid -> {
                     Toast.makeText(getContext(), "Đã hủy đăng ký: " + item.getTenBaiTapLon(), Toast.LENGTH_SHORT).show();
-                    loadBaiTapDaDangKy(); // Load lại danh sách sau khi xóa
+                    loadBaiTapDaDangKy();
                 })
                 .addOnFailureListener(e -> {
                     Toast.makeText(getContext(), "Lỗi khi hủy đăng ký: " + e.getMessage(), Toast.LENGTH_SHORT).show();
+                });
+    }
+
+    private void loadCanNangNguoiDung() {
+        String userId = FirebaseAuth.getInstance().getUid();
+        if (userId == null) return;
+        db.collection("NguoiDung")
+                .document(userId)
+                .get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    if (documentSnapshot.exists()) {
+                        Double canNangVal = documentSnapshot.getDouble("ThongTinNguoiDung.CanNang");
+                        if (canNangVal != null) {
+                            canNang = canNangVal;
+                            if (adapter != null) {
+                                adapter.setCanNang(canNang);
+                            }
+                            if (daDangKyAdapter != null) {
+                                daDangKyAdapter.setCanNang(canNang);
+                            }
+                        }
+                    }
                 });
     }
 
@@ -193,6 +209,45 @@ public class TapLuyen_Fragment extends Fragment {
                 });
     }
 
+    private void loadChiTietNgay(Ngay ngay) {
+        db.collection("KeHoach")
+                .document(phanLoai)
+                .collection("Ngay")
+                .document(ngay.getId())
+                .collection("DanhSachBaiTapLon")
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    List<BaiTapLon> listBtl = new ArrayList<>();
+                    for (QueryDocumentSnapshot doc : queryDocumentSnapshots) {
+                        BaiTapLon btl = doc.toObject(BaiTapLon.class);
+                        btl.setId(doc.getId());
+                        listBtl.add(btl);
+                        loadBaiTapNhoChoNgay(ngay, btl);
+                    }
+                    ngay.setDanhSachBaiTapLon(listBtl);
+                    adapter.notifyDataSetChanged();
+                });
+    }
+
+    private void loadBaiTapNhoChoNgay(Ngay ngay, BaiTapLon btl) {
+        db.collection("KeHoach")
+                .document(phanLoai)
+                .collection("Ngay")
+                .document(ngay.getId())
+                .collection("DanhSachBaiTapLon")
+                .document(btl.getId())
+                .collection("DanhSachBaiTapNho")
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    List<com.example.gymhome.model.BaiTapNho> listNho = new ArrayList<>();
+                    for (QueryDocumentSnapshot doc : queryDocumentSnapshots) {
+                        listNho.add(doc.toObject(com.example.gymhome.model.BaiTapNho.class));
+                    }
+                    btl.setDanhSachBaiTapNho(listNho);
+                    adapter.notifyDataSetChanged();
+                });
+    }
+
     private void loadKeHoachData() {
         // Khởi tạo 30 ngày mặc định
         List<Ngay> danhSachNgayKhoiTao = new ArrayList<>();
@@ -216,6 +271,7 @@ public class TapLuyen_Fragment extends Fragment {
                             Ngay ngay = document.toObject(Ngay.class);
                             ngay.setId(document.getId());
                             duLieuFirebase.put(document.getId(), ngay);
+                            loadChiTietNgay(ngay);
                         }
 
                         danhSachNgay.clear();

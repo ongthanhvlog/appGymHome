@@ -38,6 +38,7 @@ public class DanhSachBaiTapNho extends AppCompatActivity {
     private BaiTapNhoAdapter adapter;
     private List<BaiTapNho> danhSachBaiTapNho;
     private FirebaseFirestore db;
+    private double canNang;
     
     private String capDo, ngayId, baiTapLonId;
     private boolean isRegistered = false;
@@ -86,8 +87,10 @@ public class DanhSachBaiTapNho extends AppCompatActivity {
         db = FirebaseFirestore.getInstance();
         danhSachBaiTapNho = new ArrayList<>();
         rvBaiTapNho.setLayoutManager(new LinearLayoutManager(this));
+
+        loadCanNangNguoiDung();
         
-        adapter = new BaiTapNhoAdapter(danhSachBaiTapNho, item -> {
+        adapter = new BaiTapNhoAdapter(danhSachBaiTapNho, canNang, item -> {
             int position = danhSachBaiTapNho.indexOf(item);
             Intent intent = new Intent(DanhSachBaiTapNho.this, com.example.gymhome.activity.BaiTapNho.class);
             intent.putExtra("DanhSachBaiTap", (ArrayList<BaiTapNho>) danhSachBaiTapNho);
@@ -98,7 +101,6 @@ public class DanhSachBaiTapNho extends AppCompatActivity {
 
         // xu ly click
         ibQuayLai.setOnClickListener(v -> finish());
-
         btnBatDauTapLuyen.setOnClickListener(v -> {
             if (!danhSachBaiTapNho.isEmpty()) {
                 Intent intent = new Intent(DanhSachBaiTapNho.this, com.example.gymhome.activity.BaiTapNho.class);
@@ -115,6 +117,28 @@ public class DanhSachBaiTapNho extends AppCompatActivity {
         } else if (capDo != null && ngayId != null && baiTapLonId != null) {
             loadDanhSachBaiTapNho();
         }
+    }
+
+    private void loadCanNangNguoiDung() {
+        String userId = FirebaseAuth.getInstance().getUid();
+        if (userId == null) return;
+        db.collection("NguoiDung").document(userId).get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    if (documentSnapshot.exists()) {
+                        Double canNangVal = documentSnapshot.getDouble("ThongTinNguoiDung.CanNang");
+                        if (canNangVal != null) {
+                            this.canNang = canNangVal;
+                            adapter = new BaiTapNhoAdapter(danhSachBaiTapNho, this.canNang, item -> {
+                                int position = danhSachBaiTapNho.indexOf(item);
+                                Intent intent = new Intent(DanhSachBaiTapNho.this, com.example.gymhome.activity.BaiTapNho.class);
+                                intent.putExtra("DanhSachBaiTap", (ArrayList<BaiTapNho>) danhSachBaiTapNho);
+                                intent.putExtra("ViTriHienTai", position);
+                                startActivity(intent);
+                            });
+                            rvBaiTapNho.setAdapter(adapter);
+                        }
+                    }
+                });
     }
 
     private void loadDanhSachBaiTapNhoDaDangKy() {

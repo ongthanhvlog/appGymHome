@@ -34,9 +34,9 @@ public class TrangChu_Fragment extends Fragment {
     private List<ThuThach> thuThachList;
     private FirebaseFirestore db;
     private TextView tvXemTatCaThuThach;
+    private double canNang = 0.0;
 
     public TrangChu_Fragment() {
-        // Required empty public constructor
     }
 
     @Override
@@ -44,7 +44,6 @@ public class TrangChu_Fragment extends Fragment {
                              Bundle savedInstanceState) {
 
         View view = inflater.inflate(R.layout.trangchu, container, false);
-
         db = FirebaseFirestore.getInstance();
 
         // Vùng tập trung
@@ -84,6 +83,12 @@ public class TrangChu_Fragment extends Fragment {
         return view;
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        loadCanNangNguoiDung();
+    }
+
     private void loadThuThachData() {
         db.collection("ThuThach")
                 .limit(2)
@@ -97,6 +102,24 @@ public class TrangChu_Fragment extends Fragment {
                             thuThachList.add(item);
                         }
                         thuThachAdapter.notifyDataSetChanged();
+                    }
+                });
+    }
+
+    private void loadCanNangNguoiDung() {
+        com.google.firebase.auth.FirebaseAuth auth = com.google.firebase.auth.FirebaseAuth.getInstance();
+        if (auth.getUid() == null) return;
+
+        db.collection("NguoiDung").document(auth.getUid()).get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    if (documentSnapshot.exists()) {
+                        Double canNang = documentSnapshot.getDouble("ThongTinNguoiDung.CanNang");
+                        if (canNang != null) {
+                            this.canNang = canNang;
+                            if (thuThachAdapter != null) {
+                                thuThachAdapter.setCanNang(canNang);
+                            }
+                        }
                     }
                 });
     }

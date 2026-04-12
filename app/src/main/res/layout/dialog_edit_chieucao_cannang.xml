@@ -1,0 +1,184 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="24dp"
+    android:background="@drawable/top_rounded_white">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Chỉnh sửa chỉ số"
+        android:textColor="@color/black"
+        android:textSize="20sp"
+        android:textStyle="bold"
+        android:layout_marginBottom="8dp"/>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Cập nhật chiều cao và cân nặng để tính toán lại chỉ số BMI của bạn."
+        android:textSize="14sp"
+        android:layout_marginBottom="24dp"/>
+
+    <!-- Height Selector -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Chiều cao"
+        android:textColor="@color/black"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:layout_marginBottom="8dp"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:layout_marginBottom="8dp">
+
+        <ImageButton
+            android:id="@+id/btnGiamChieuCao"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:src="@drawable/ic_minus"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:scaleType="fitCenter"/>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="bottom"
+            android:layout_marginHorizontal="24dp">
+            <TextView
+                android:id="@+id/tvChieuCao"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="170"
+                android:textColor="#2196F3"
+                android:textSize="36sp"
+                android:textStyle="bold"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text=" cm"
+                android:textColor="#2196F3"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:layout_marginBottom="6dp"/>
+        </LinearLayout>
+
+        <ImageButton
+            android:id="@+id/btnTangChieuCao"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:src="@drawable/ic_plus"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:scaleType="fitCenter"/>
+    </LinearLayout>
+
+    <SeekBar
+        android:id="@+id/seekBarChieuCao"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:max="250"
+        android:progress="170"
+        android:progressDrawable="@drawable/custom_seekbar_progress"
+        android:thumb="@drawable/custom_seekbar_thumb"
+        android:layout_marginBottom="24dp"/>
+
+    <!-- Weight Selector -->
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Cân nặng"
+        android:textColor="@color/black"
+        android:textSize="18sp"
+        android:textStyle="bold"
+        android:layout_marginBottom="8dp"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="horizontal"
+        android:layout_marginBottom="8dp">
+
+        <ImageButton
+            android:id="@+id/btnGiamCanNang"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:src="@drawable/ic_minus"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:scaleType="fitCenter"/>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="bottom"
+            android:layout_marginHorizontal="24dp">
+            <TextView
+                android:id="@+id/tvCanNang"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="60.0"
+                android:textColor="#2196F3"
+                android:textSize="36sp"
+                android:textStyle="bold"/>
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text=" kg"
+                android:textColor="#2196F3"
+                android:textSize="20sp"
+                android:textStyle="bold"
+                android:layout_marginBottom="6dp"/>
+        </LinearLayout>
+
+        <ImageButton
+            android:id="@+id/btnTangCanNang"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:src="@drawable/ic_plus"
+            android:background="?attr/selectableItemBackgroundBorderless"
+            android:scaleType="fitCenter"/>
+    </LinearLayout>
+
+    <SeekBar
+        android:id="@+id/seekBarCanNang"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:max="2000"
+        android:progress="600"
+        android:progressDrawable="@drawable/custom_seekbar_progress"
+        android:thumb="@drawable/custom_seekbar_thumb"
+        android:layout_marginBottom="32dp"/>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+        <Button
+            android:id="@+id/btnCancel"
+            android:layout_width="0dp"
+            android:layout_height="56dp"
+            android:layout_weight="1"
+            android:text="Hủy bỏ"
+            android:backgroundTint="#F5F5F5"
+            android:textColor="@color/black"
+            android:layout_marginEnd="8dp"/>
+        <Button
+            android:id="@+id/btnSave"
+            android:layout_width="0dp"
+            android:layout_height="56dp"
+            android:layout_weight="1"
+            android:text="Lưu"
+            android:backgroundTint="#2196F3"
+            android:textColor="@color/white"
+            android:layout_marginStart="8dp"/>
+    </LinearLayout>
+</LinearLayout>

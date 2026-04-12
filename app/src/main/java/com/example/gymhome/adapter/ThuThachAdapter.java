@@ -17,16 +17,27 @@ import java.util.List;
 
 public class ThuThachAdapter extends RecyclerView.Adapter<ThuThachAdapter.ViewHolder> {
 
-    private List<ThuThach> list;
+    private List<ThuThach> danhSachThuThach;
     private OnItemClickListener listener;
+    private double canNang;
 
     public interface OnItemClickListener {
         void onItemClick(ThuThach item);
     }
 
-    public ThuThachAdapter(List<ThuThach> list, OnItemClickListener listener) {
-        this.list = list;
+    public ThuThachAdapter(List<ThuThach> danhSachThuThach, double canNang, OnItemClickListener listener) {
+        this.danhSachThuThach = danhSachThuThach;
+        this.canNang = canNang;
         this.listener = listener;
+    }
+
+    public ThuThachAdapter(List<ThuThach> danhSachThuThach, OnItemClickListener listener) {
+        this(danhSachThuThach, 0.0, listener);
+    }
+
+    public void setCanNang(double canNang) {
+        this.canNang = canNang;
+        notifyDataSetChanged();
     }
 
     @NonNull
@@ -38,7 +49,7 @@ public class ThuThachAdapter extends RecyclerView.Adapter<ThuThachAdapter.ViewHo
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        ThuThach item = list.get(position);
+        ThuThach item = danhSachThuThach.get(position);
         holder.tvTenThuThach.setText(item.getTenThuThach());
 
         int totalSeconds = item.getThoiGian();
@@ -46,6 +57,11 @@ public class ThuThachAdapter extends RecyclerView.Adapter<ThuThachAdapter.ViewHo
         holder.tvThoiGian.setText(minutes + " phút");
 
         holder.tvCapDo.setText(item.getCapDo());
+
+        // Tính Calo = MET * Cân nặng * Thời gian (giờ)
+        double metValue = item.getMET();
+        double calo = metValue * canNang * (totalSeconds / 3600.0);
+        holder.tvCalo.setText(String.format("%.1f kcal", calo));
 
         Glide.with(holder.itemView.getContext())
                 .load(item.getHinhAnh())
@@ -58,12 +74,12 @@ public class ThuThachAdapter extends RecyclerView.Adapter<ThuThachAdapter.ViewHo
 
     @Override
     public int getItemCount() {
-        return list.size();
+        return danhSachThuThach.size();
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         ImageView imgThuThach;
-        TextView tvTenThuThach, tvThoiGian, tvCapDo;
+        TextView tvTenThuThach, tvThoiGian, tvCapDo, tvCalo;
         android.widget.Button btnThucHien;
 
         public ViewHolder(@NonNull View itemView) {
@@ -72,6 +88,7 @@ public class ThuThachAdapter extends RecyclerView.Adapter<ThuThachAdapter.ViewHo
             tvTenThuThach = itemView.findViewById(R.id.tvTenThuThach);
             tvThoiGian = itemView.findViewById(R.id.tvThoiGian);
             tvCapDo = itemView.findViewById(R.id.tvCapDo);
+            tvCalo = itemView.findViewById(R.id.tvCalo);
             btnThucHien = itemView.findViewById(R.id.btnThucHien);
         }
     }

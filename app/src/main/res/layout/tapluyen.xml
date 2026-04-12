@@ -8,7 +8,7 @@
     tools:context=".fragment.TapLuyen_Fragment">
 
     <TextView
-        android:id="@+id/titleTapLuyen"
+        android:id="@+id/titleTrangChu"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="32dp"
@@ -30,7 +30,7 @@
         android:padding="5dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/titleTapLuyen">
+        app:layout_constraintTop_toBottomOf="@+id/titleTrangChu">
 
         <TextView
             android:id="@+id/tabNguoiMoiBatDau"
