@@ -7,7 +7,7 @@
     tools:context=".fragment.TrangChu_Fragment">
 
     <TextView
-        android:id="@+id/titleTapLuyen"
+        android:id="@+id/titleTrangChu"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="28dp"
@@ -35,7 +35,7 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/titleTapLuyen">
+        app:layout_constraintTop_toBottomOf="@+id/titleTrangChu">
 
         <LinearLayout
             android:layout_width="match_parent"

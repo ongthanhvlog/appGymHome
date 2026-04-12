@@ -7,6 +7,7 @@ public class ThuThach implements Serializable {
     private String TenThuThach;
     private String MoTa;
     private int ThoiGian;
+    private double MET;
     private String CapDo;
     private String VideoHuongDan;
     private String VideoType;
@@ -14,11 +15,12 @@ public class ThuThach implements Serializable {
     public ThuThach() {
     }
     //Contructor
-    public ThuThach(String thuThachId, String tenThuThach, String moTa, int thoiGian, String capDo, String videoHuongDan, String videoType, String hinhAnh){
+    public ThuThach(String thuThachId, String tenThuThach, String moTa, int thoiGian, double MET, String capDo, String videoHuongDan, String videoType, String hinhAnh){
         this.ThuThachId = thuThachId;
         this.TenThuThach = tenThuThach;
         this.MoTa = moTa;
         this.ThoiGian = thoiGian;
+        this.MET = MET;
         this.CapDo = capDo;
         this.VideoHuongDan = videoHuongDan;
         this.VideoType = videoType;
@@ -55,6 +57,14 @@ public class ThuThach implements Serializable {
 
     public void setThoiGian(int thoiGian) {
         ThoiGian = thoiGian;
+    }
+
+    public double getMET() {
+        return MET;
+    }
+
+    public void setMET(double MET) {
+        this.MET = MET;
     }
 
     public String getCapDo() {

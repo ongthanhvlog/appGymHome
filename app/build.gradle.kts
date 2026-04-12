@@ -47,6 +47,7 @@ dependencies {
     implementation(libs.gridlayout)
     implementation(libs.media3.exoplayer)
     implementation(libs.media3.ui)
+    implementation(libs.mpandroidchart)
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)

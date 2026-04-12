@@ -29,6 +29,10 @@ import androidx.media3.exoplayer.source.DefaultMediaSourceFactory;
 import com.example.gymhome.R;
 import com.example.gymhome.model.ThuThach;
 import com.example.gymhome.utils.VideoCacheManager;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FieldValue;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.Locale;
 
@@ -46,6 +50,8 @@ public class ChiTietThuThach extends AppCompatActivity {
     private boolean isPaused = false;
     private boolean isBatLapLai = false;
     private AudioManager audioManager;
+    private FirebaseFirestore db;
+    private String userId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,6 +80,9 @@ public class ChiTietThuThach extends AppCompatActivity {
         videoCard = findViewById(R.id.videoCard);
         videoProgressBar = findViewById(R.id.videoProgressBar);
         seekBarAmLuong = findViewById(R.id.seekBarAmLuong);
+
+        db = FirebaseFirestore.getInstance();
+        userId = FirebaseAuth.getInstance().getUid();
 
         thietLapGiaoDien();
         khoiTaoVideoPlayer();
@@ -154,7 +163,6 @@ public class ChiTietThuThach extends AppCompatActivity {
 
     private void hienThiDuLieu() {
         if (thuThach == null) return;
-
         tvTenBaiTapNho.setText(thuThach.getTenThuThach());
         tvMoTaBaiTapNho.setText(thuThach.getMoTa());
         thoiGianConLai = (thuThach.getThoiGian() > 0 ? thuThach.getThoiGian() : 30) * 1000L;
@@ -182,11 +190,52 @@ public class ChiTietThuThach extends AppCompatActivity {
             public void onFinish() {
                 if (isBatLapLai) hienThiDuLieu();
                 else {
-                    Toast.makeText(ChiTietThuThach.this, "Hoàn thành thử thách!", Toast.LENGTH_SHORT).show();
-                    finish();
+                    capNhatHoanThanhThuThach();
                 }
             }
         }.start();
+    }
+
+    private void capNhatHoanThanhThuThach() {
+        if (userId == null) {
+            Toast.makeText(ChiTietThuThach.this, "Hoàn thành thử thách!", Toast.LENGTH_SHORT).show();
+            finish();
+            return;
+        }
+
+        DocumentReference userRef = db.collection("NguoiDung").document(userId);
+        userRef.get().addOnSuccessListener(documentSnapshot -> {
+            if (documentSnapshot.exists()) {
+                double canNang = 0;
+                try {
+                    Double cn = documentSnapshot.getDouble("ThongTinNguoiDung.CanNang");
+                    if (cn != null) canNang = cn;
+                } catch (Exception e) {}
+
+                if (canNang <= 0) {
+                    Toast.makeText(ChiTietThuThach.this, "Vui lòng cập nhật cân nặng trong hồ sơ!", Toast.LENGTH_SHORT).show();
+                    finish();
+                    return;
+                }
+
+                double metValue = thuThach.getMET();
+                if (metValue <= 0) {
+                    metValue = 5.0; // Đây là giá trị mặc định nếu Firebase không có MET cho thử thách này
+                }
+                double calo = metValue * canNang * (thuThach.getThoiGian() / 3600.0);
+                
+                userRef.update(
+                        "ThongTinNguoiDung.SoBaiTapHoanThanh", FieldValue.increment(1),
+                        "ThongTinNguoiDung.TongCalo", FieldValue.increment(Math.max(0.1, calo)),
+                        "ThongTinNguoiDung.ThoiGianTapLuyen", FieldValue.increment(thuThach.getThoiGian())
+                ).addOnSuccessListener(aVoid -> {
+                    Toast.makeText(ChiTietThuThach.this, "Hoàn thành thử thách!", Toast.LENGTH_SHORT).show();
+                    finish();
+                }).addOnFailureListener(e -> finish());
+            } else {
+                finish();
+            }
+        }).addOnFailureListener(e -> finish());
     }
 
     private void tamDung() {

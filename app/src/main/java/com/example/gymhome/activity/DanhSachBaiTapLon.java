@@ -18,6 +18,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.example.gymhome.R;
 import com.example.gymhome.adapter.BaiTapLonAdapter;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
@@ -35,6 +36,7 @@ public class DanhSachBaiTapLon extends AppCompatActivity {
     private FirebaseFirestore db;
     private String ngayId;
     private String capDo;
+    private double canNang;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,7 +72,10 @@ public class DanhSachBaiTapLon extends AppCompatActivity {
         db = FirebaseFirestore.getInstance();
         danhSachBaiTapLon = new ArrayList<>();
         rvBaiTapLon.setLayoutManager(new LinearLayoutManager(this));
-        adapter = new BaiTapLonAdapter(danhSachBaiTapLon, item -> {
+        
+        loadCanNangNguoiDung();
+
+        adapter = new BaiTapLonAdapter(danhSachBaiTapLon, canNang, item -> {
             Intent intent = new Intent(DanhSachBaiTapLon.this, DanhSachBaiTapNho.class);
             intent.putExtra("CapDo", capDo);
             intent.putExtra("NgayId", ngayId);
@@ -101,10 +106,55 @@ public class DanhSachBaiTapLon extends AppCompatActivity {
                             com.example.gymhome.model.BaiTapLon item = document.toObject(com.example.gymhome.model.BaiTapLon.class);
                             item.setId(document.getId());
                             danhSachBaiTapLon.add(item);
+                            loadBaiTapNhoForItem(item);
                         }
-                        adapter.notifyDataSetChanged();
                     } else {
                         Toast.makeText(this, "Lỗi tải dữ liệu: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                    }
+                });
+    }
+
+    private void loadBaiTapNhoForItem(com.example.gymhome.model.BaiTapLon item) {
+        db.collection("KeHoach")
+                .document(capDo)
+                .collection("Ngay")
+                .document(ngayId)
+                .collection("DanhSachBaiTapLon")
+                .document(item.getId())
+                .collection("DanhSachBaiTapNho")
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    List<com.example.gymhome.model.BaiTapNho> listNho = new ArrayList<>();
+                    for (QueryDocumentSnapshot doc : queryDocumentSnapshots) {
+                        listNho.add(doc.toObject(com.example.gymhome.model.BaiTapNho.class));
+                    }
+                    item.setDanhSachBaiTapNho(listNho);
+                    adapter.notifyDataSetChanged();
+                });
+    }
+
+    private void loadCanNangNguoiDung() {
+        String userId = FirebaseAuth.getInstance().getUid();
+        if (userId == null) return;
+
+        db.collection("NguoiDung").document(userId).get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    if (documentSnapshot.exists()) {
+                        Double canNangVal = documentSnapshot.getDouble("ThongTinNguoiDung.CanNang");
+                        if (canNangVal != null) {
+                            this.canNang = canNangVal;
+                            adapter = new BaiTapLonAdapter(danhSachBaiTapLon, this.canNang, item -> {
+                                Intent intent = new Intent(DanhSachBaiTapLon.this, DanhSachBaiTapNho.class);
+                                intent.putExtra("CapDo", capDo);
+                                intent.putExtra("NgayId", ngayId);
+                                intent.putExtra("BaiTapLonId", item.getId());
+                                intent.putExtra("TenBaiTapLon", item.getTenBaiTapLon());
+                                intent.putExtra("MoTa", item.getMoTa());
+                                intent.putExtra("HinhAnh", item.getHinhAnh());
+                                startActivity(intent);
+                            });
+                            rvBaiTapLon.setAdapter(adapter);
+                        }
                     }
                 });
     }

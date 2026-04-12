@@ -19,14 +19,20 @@ public class NgayAdapter extends RecyclerView.Adapter<NgayAdapter.ViewHolder> {
 
     private List<Ngay>  danhSachNgay;
     private OnItemClickListener listener;
+    private double canNang;
 
     public interface OnItemClickListener {
         void onItemClick(Ngay item);
     }
 
-    public NgayAdapter(List<Ngay> danhSachNgay, OnItemClickListener listener) {
+    public NgayAdapter(List<Ngay> danhSachNgay, double canNang, OnItemClickListener listener) {
         this.danhSachNgay = danhSachNgay;
+        this.canNang = canNang;
         this.listener = listener;
+    }
+
+    public NgayAdapter(List<Ngay> danhSachNgay, OnItemClickListener listener) {
+        this(danhSachNgay, 0.0, listener);
     }
 
     @NonNull
@@ -34,6 +40,11 @@ public class NgayAdapter extends RecyclerView.Adapter<NgayAdapter.ViewHolder> {
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext()).inflate(R.layout.item_ngay, parent, false);
         return new ViewHolder(view);
+    }
+
+    public void setCanNang(double canNang) {
+        this.canNang = canNang;
+        notifyDataSetChanged();
     }
 
     @Override
@@ -46,6 +57,9 @@ public class NgayAdapter extends RecyclerView.Adapter<NgayAdapter.ViewHolder> {
         
         holder.tvThoiGian.setText(item.getTongThoiGianDisplay() + " phút");
         holder.tvSoBaiTap.setText(item.getSoLuongBaiTapLonDisplay() + " bài tập");
+
+        double calo = item.tinhTongCalo(canNang);
+        holder.tvCalo.setText(String.format("%.1f kcal", calo));
 
         Glide.with(holder.itemView.getContext())
                 .load(item.getHinhAnh())
@@ -62,7 +76,7 @@ public class NgayAdapter extends RecyclerView.Adapter<NgayAdapter.ViewHolder> {
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
-        TextView tvTenNgay, tvThoiGian, tvSoBaiTap, tvSoNgay;
+        TextView tvTenNgay, tvThoiGian, tvSoBaiTap, tvSoNgay, tvCalo;
         ImageView ivHinhAnhNgay;
 
         public ViewHolder(@NonNull View itemView) {
@@ -72,6 +86,7 @@ public class NgayAdapter extends RecyclerView.Adapter<NgayAdapter.ViewHolder> {
             tvTenNgay = itemView.findViewById(R.id.tvTenNgay);
             tvThoiGian = itemView.findViewById(R.id.tvTongThoiGian);
             tvSoBaiTap = itemView.findViewById(R.id.tvSoLuongBaiTapLon);
+            tvCalo = itemView.findViewById(R.id.tvCalo);
         }
     }
 }

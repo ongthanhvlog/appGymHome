@@ -33,8 +33,13 @@ import androidx.media3.ui.AspectRatioFrameLayout;
 import androidx.media3.ui.PlayerView;
 
 import androidx.media3.exoplayer.source.DefaultMediaSourceFactory;
+
 import com.example.gymhome.utils.VideoCacheManager;
 import com.example.gymhome.R;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FieldValue;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -55,6 +60,8 @@ public class BaiTapNho extends AppCompatActivity {
     private ExoPlayer exoPlayer;
     private CountDownTimer demNguocThoiGianBaiTap;
     private AudioManager audioManager;
+    private FirebaseFirestore db;
+    private String userId;
 
     @Override
     protected void onCreate(Bundle trangThaiLuuTru) {
@@ -87,6 +94,10 @@ public class BaiTapNho extends AppCompatActivity {
         viTriHienTai = getIntent().getIntExtra("ViTriHienTai", 0);
         thietLapAmLuong();
         khoiTaoTrinhPhatVideo();
+
+        db = FirebaseFirestore.getInstance();
+        userId = FirebaseAuth.getInstance().getUid();
+
         if (danhSachBaiTapNho != null && !danhSachBaiTapNho.isEmpty()) {
             hienThiThongTinBaiTap(viTriHienTai);
         }
@@ -216,12 +227,6 @@ public class BaiTapNho extends AppCompatActivity {
         String duongDanVideo = baiTap.getVideoHuongDan();
         if (duongDanVideo != null && !duongDanVideo.isEmpty() && duongDanVideo.startsWith("http")) {
             exoPlayer.setMediaItem(MediaItem.fromUri(Uri.parse(duongDanVideo)));
-            if (viTri + 1 < danhSachBaiTapNho.size()) {
-                String nextVideo = danhSachBaiTapNho.get(viTri + 1).getVideoHuongDan();
-                if (nextVideo != null && nextVideo.startsWith("http")) {
-                    exoPlayer.addMediaItem(MediaItem.fromUri(Uri.parse(nextVideo)));
-                }
-            }
             exoPlayer.prepare();
             exoPlayer.play();
         } else {
@@ -265,9 +270,52 @@ public class BaiTapNho extends AppCompatActivity {
             viTriHienTai = viTriMoi;
             hienThiThongTinBaiTap(viTriHienTai);
         } else if (viTriMoi >= danhSachBaiTapNho.size()) {
+            capNhatThongTinHoanThanh();
+        }
+    }
+
+    private void capNhatThongTinHoanThanh() {
+        if (userId == null) {
             Toast.makeText(this, "Chúc mừng! Bạn đã hoàn thành bài tập!", Toast.LENGTH_LONG).show();
             finish();
+            return;
         }
+
+        DocumentReference userRef = db.collection("NguoiDung").document(userId);
+        userRef.get().addOnSuccessListener(documentSnapshot -> {
+            if (documentSnapshot.exists()) {
+                double canNang = 0;
+                try {
+                    Double cn = documentSnapshot.getDouble("ThongTinNguoiDung.CanNang");
+                    if (cn != null) canNang = cn;
+                } catch (Exception e) {}
+
+                if (canNang <= 0) {
+                    Toast.makeText(this, "Vui lòng cập nhật cân nặng để tính Calo chính xác!", Toast.LENGTH_SHORT).show();
+                    // Vẫn tiếp tục nhưng calo sẽ là 0 hoặc xử lý tùy ý, ở đây tôi giả định nếu không có cân nặng thì không tính calo
+                }
+
+                double tongCaloBaiTap = 0;
+                int tongThoiGianBaiTap = 0;
+                for (com.example.gymhome.model.BaiTapNho bt : danhSachBaiTapNho) {
+                    tongThoiGianBaiTap += bt.getThoiGian();
+                    tongCaloBaiTap += bt.getMET() * canNang * (bt.getThoiGian() / 3600.0);
+                }
+
+                userRef.update(
+                        "ThongTinNguoiDung.SoBaiTapHoanThanh", FieldValue.increment(1),
+                        "ThongTinNguoiDung.TongCalo", FieldValue.increment(tongCaloBaiTap),
+                        "ThongTinNguoiDung.ThoiGianTapLuyen", FieldValue.increment(tongThoiGianBaiTap)
+                ).addOnSuccessListener(aVoid -> {
+                    Toast.makeText(this, "Chúc mừng! Bạn đã hoàn thành bài tập!", Toast.LENGTH_LONG).show();
+                    finish();
+                }).addOnFailureListener(e -> {
+                    finish();
+                });
+            } else {
+                finish();
+            }
+        }).addOnFailureListener(e -> finish());
     }
 
     private void capNhatThoiGianHienThi() {

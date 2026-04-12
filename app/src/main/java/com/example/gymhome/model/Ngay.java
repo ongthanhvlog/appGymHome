@@ -1,6 +1,8 @@
 package com.example.gymhome.model;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Ngay implements Serializable {
     private String Id;
@@ -8,6 +10,7 @@ public class Ngay implements Serializable {
     private int SoLuongBaiTapLon;
     private String HinhAnh;
     private String MoTa;
+    private List<BaiTapLon> danhSachBaiTapLon = new ArrayList<>();
 
     public Ngay() {
     }
@@ -62,12 +65,30 @@ public class Ngay implements Serializable {
         MoTa = moTa;
     }
 
+    public List<BaiTapLon> getDanhSachBaiTapLon() {
+        return danhSachBaiTapLon;
+    }
+
+    public void setDanhSachBaiTapLon(List<BaiTapLon> danhSachBaiTapLon) {
+        this.danhSachBaiTapLon = danhSachBaiTapLon;
+    }
+
     public String getTongThoiGianDisplay() {
         return String.valueOf(TongThoiGian / 60);
     }
 
     public String getSoLuongBaiTapLonDisplay() {
         return String.valueOf(SoLuongBaiTapLon);
+    }
+
+    public double tinhTongCalo(double canNang) {
+        double total = 0;
+        if (danhSachBaiTapLon != null) {
+            for (BaiTapLon btl : danhSachBaiTapLon) {
+                total += btl.tinhTongCalo(canNang);
+            }
+        }
+        return total;
     }
 
     public int getNgayNumber() {
