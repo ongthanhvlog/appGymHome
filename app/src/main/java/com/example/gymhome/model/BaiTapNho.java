@@ -100,4 +100,9 @@ public class BaiTapNho implements Serializable {
     public void setHinhAnh(String hinhAnh) {
         HinhAnh = hinhAnh;
     }
+
+    public double tinhCalo(double canNang) {
+        // calo = MET * Cân nặng * Thời gian (giờ)
+        return MET * canNang * (ThoiGian / 3600.0);
+    }
 }
