@@ -11,30 +11,38 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.example.gymhome.R;
-import com.example.gymhome.activity.DanhSachThuThach;
 import com.example.gymhome.adapter.ThuThachAdapter;
 import com.example.gymhome.adapter.VungTapTrungAdapter;
 import com.example.gymhome.model.ThuThach;
 import com.example.gymhome.model.VungTapTrung;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.ArrayList;
 import java.util.List;
 
+import android.util.Log;
+import com.example.gymhome.adapter.BaiVietAdapter;
+import com.example.gymhome.model.BaiViet;
+
+import android.widget.ProgressBar;
+
 public class TrangChu_Fragment extends Fragment {
 
-    private RecyclerView rvVungTapTrung, rvThuThachTrangChu;
+    private RecyclerView rvVungTapTrung, rvThuThachTrangChu, rvBaiVietMoi;
     private VungTapTrungAdapter adapter;
     private ThuThachAdapter thuThachAdapter;
-    private List<VungTapTrung> vungTapTrungList;
-    private List<ThuThach> thuThachList;
+    private BaiVietAdapter baiVietAdapter;
+    private List<VungTapTrung> danhSachVungTapTrung;
+    private List<ThuThach> danhSachThuThach;
+    private List<BaiViet> danhSachBaiViet;
     private FirebaseFirestore db;
-    private TextView tvXemTatCaThuThach;
-    private double canNang = 0.0;
+    private TextView tvXemTatCaThuThach, tvXemTatCaBaiViet, tvErrorBaiViet;
+    private ProgressBar pbLoadingBaiViet;
+    private com.google.firebase.firestore.ListenerRegistration vungTapTrungListener, thuThachListener, baiVietListener;
 
     public TrangChu_Fragment() {
     }
@@ -46,12 +54,11 @@ public class TrangChu_Fragment extends Fragment {
         View view = inflater.inflate(R.layout.trangchu, container, false);
         db = FirebaseFirestore.getInstance();
 
-        // Vùng tập trung
+        // Setup UI
         rvVungTapTrung = view.findViewById(R.id.rvVungTapTrung);
         rvVungTapTrung.setLayoutManager(new GridLayoutManager(getContext(), 2));
-
-        vungTapTrungList = new ArrayList<>();
-        adapter = new VungTapTrungAdapter(vungTapTrungList, item -> {
+        danhSachVungTapTrung = new ArrayList<>();
+        adapter = new VungTapTrungAdapter(danhSachVungTapTrung, item -> {
             Intent intent = new Intent(getActivity(), com.example.gymhome.activity.VungTapTrung.class);
             intent.putExtra("VungId", item.getId());
             intent.putExtra("TenVung", item.getTenVung());
@@ -60,85 +67,117 @@ public class TrangChu_Fragment extends Fragment {
             startActivity(intent);
         });
         rvVungTapTrung.setAdapter(adapter);
+
         rvThuThachTrangChu = view.findViewById(R.id.rvThuThach);
         rvThuThachTrangChu.setLayoutManager(new androidx.recyclerview.widget.LinearLayoutManager(getContext()));
-        rvThuThachTrangChu.setNestedScrollingEnabled(false);
-        
-        thuThachList = new ArrayList<>();
-        thuThachAdapter = new ThuThachAdapter(thuThachList, item -> {
+        danhSachThuThach = new ArrayList<>();
+        thuThachAdapter = new ThuThachAdapter(danhSachThuThach, item -> {
             Intent intent = new Intent(getActivity(), com.example.gymhome.activity.ChiTietThuThach.class);
             intent.putExtra("ThuThachData", item);
             startActivity(intent);
         });
         rvThuThachTrangChu.setAdapter(thuThachAdapter);
-        tvXemTatCaThuThach = view.findViewById(R.id.tvXemTatCaThuThach);
-        tvXemTatCaThuThach.setOnClickListener(v -> {
-            Intent intent = new Intent(getActivity(), DanhSachThuThach.class);
+
+        rvBaiVietMoi = view.findViewById(R.id.rvBaiVietMoi);
+        pbLoadingBaiViet = view.findViewById(R.id.pbLoadingBaiViet);
+        tvErrorBaiViet = view.findViewById(R.id.tvErrorBaiViet);
+        tvXemTatCaBaiViet = view.findViewById(R.id.tvXemTatCaBaiViet);
+
+        rvBaiVietMoi.setLayoutManager(new androidx.recyclerview.widget.LinearLayoutManager(getContext()));
+        danhSachBaiViet = new ArrayList<>();
+        baiVietAdapter = new BaiVietAdapter(danhSachBaiViet, item -> {
+            Intent intent = new Intent(getActivity(), com.example.gymhome.activity.ChiTietBaiVietActivity.class);
+            intent.putExtra("BaiViet", item);
             startActivity(intent);
         });
+        rvBaiVietMoi.setAdapter(baiVietAdapter);
+
+        tvXemTatCaBaiViet.setOnClickListener(v -> startActivity(new Intent(getActivity(), com.example.gymhome.activity.DanhSachBaiVietActivity.class)));
+        
+        tvXemTatCaThuThach = view.findViewById(R.id.tvXemTatCaThuThach);
+        tvXemTatCaThuThach.setOnClickListener(v -> startActivity(new Intent(getActivity(), com.example.gymhome.activity.DanhSachThuThach.class)));
 
         loadVungTapTrungData();
         loadThuThachData();
+        loadBaiVietData();
 
         return view;
     }
 
-    @Override
-    public void onResume() {
-        super.onResume();
-        loadCanNangNguoiDung();
-    }
-
     private void loadThuThachData() {
-        db.collection("ThuThach")
-                .limit(2)
-                .get()
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        thuThachList.clear();
-                        for (QueryDocumentSnapshot document : task.getResult()) {
-                            ThuThach item = document.toObject(ThuThach.class);
-                            item.setId(document.getId());
-                            thuThachList.add(item);
-                        }
-                        thuThachAdapter.notifyDataSetChanged();
-                    }
-                });
-    }
-
-    private void loadCanNangNguoiDung() {
-        com.google.firebase.auth.FirebaseAuth auth = com.google.firebase.auth.FirebaseAuth.getInstance();
-        if (auth.getUid() == null) return;
-
-        db.collection("NguoiDung").document(auth.getUid()).get()
-                .addOnSuccessListener(documentSnapshot -> {
-                    if (documentSnapshot.exists()) {
-                        Double canNang = documentSnapshot.getDouble("ThongTinNguoiDung.CanNang");
-                        if (canNang != null) {
-                            this.canNang = canNang;
-                            if (thuThachAdapter != null) {
-                                thuThachAdapter.setCanNang(canNang);
-                            }
-                        }
-                    }
-                });
+        thuThachListener = db.collection("ThuThach").limit(2).addSnapshotListener((value, error) -> {
+            if (!isAdded()) return;
+            if (error != null) return;
+            if (value != null) {
+                danhSachThuThach.clear();
+                for (QueryDocumentSnapshot document : value) {
+                    ThuThach item = document.toObject(ThuThach.class);
+                    item.setId(document.getId());
+                    danhSachThuThach.add(item);
+                }
+                thuThachAdapter.notifyDataSetChanged();
+            }
+        });
     }
 
     private void loadVungTapTrungData() {
-        db.collection("VungTapTrung")
-                .get()
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        vungTapTrungList.clear();
-                        for (QueryDocumentSnapshot document : task.getResult()) {
-                            VungTapTrung vung = document.toObject(VungTapTrung.class);
-                            vung.setId(document.getId());
-                            vungTapTrungList.add(vung);
+        vungTapTrungListener = db.collection("VungTapTrung").addSnapshotListener((value, error) -> {
+            if (!isAdded()) return;
+            if (error != null) return;
+            if (value != null) {
+                danhSachVungTapTrung.clear();
+                for (QueryDocumentSnapshot document : value) {
+                    VungTapTrung vung = document.toObject(VungTapTrung.class);
+                    vung.setId(document.getId());
+                    danhSachVungTapTrung.add(vung);
+                }
+                adapter.notifyDataSetChanged();
+            }
+        });
+    }
+
+    private void loadBaiVietData() {
+        pbLoadingBaiViet.setVisibility(View.VISIBLE);
+        tvErrorBaiViet.setVisibility(View.GONE);
+
+        baiVietListener = db.collection("BaiViet")
+                .orderBy("ngayDang", Query.Direction.DESCENDING)
+                .limit(3)
+                .addSnapshotListener((value, error) -> {
+                    if (!isAdded()) return;
+
+                    pbLoadingBaiViet.setVisibility(View.GONE);
+                    if (error != null) {
+                        Log.e("FirestoreError", "Lỗi lấy bài viết: " + error.getMessage());
+                        tvErrorBaiViet.setText("Lỗi kết nối Firestore");
+                        tvErrorBaiViet.setVisibility(View.VISIBLE);
+                        return;
+                    }
+
+                    if (value != null) {
+                        Log.d("FirestoreData", "Số lượng bài viết nhận được: " + value.size());
+                        if (value.isEmpty()) {
+                            tvErrorBaiViet.setText("Chưa có bài viết nào.");
+                            tvErrorBaiViet.setVisibility(View.VISIBLE);
+                        } else {
+                            tvErrorBaiViet.setVisibility(View.GONE);
                         }
-                        adapter.notifyDataSetChanged();
-                    } else {
-                        Toast.makeText(getContext(), "Lỗi lấy dữ liệu: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+
+                        danhSachBaiViet.clear();
+                        for (QueryDocumentSnapshot document : value) {
+                            BaiViet item = document.toObject(BaiViet.class);
+                            danhSachBaiViet.add(item);
+                        }
+                        baiVietAdapter.notifyDataSetChanged();
                     }
                 });
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        if (vungTapTrungListener != null) vungTapTrungListener.remove();
+        if (thuThachListener != null) thuThachListener.remove();
+        if (baiVietListener != null) baiVietListener.remove();
     }
 }

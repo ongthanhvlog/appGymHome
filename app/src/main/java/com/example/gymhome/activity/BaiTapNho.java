@@ -67,7 +67,7 @@ public class BaiTapNho extends AppCompatActivity {
     protected void onCreate(Bundle trangThaiLuuTru) {
         super.onCreate(trangThaiLuuTru);
         EdgeToEdge.enable(this);
-        setContentView(R.layout.baitapnho);
+        super.setContentView(R.layout.baitapnho);
 
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets thanhHeThong = insets.getInsets(WindowInsetsCompat.Type.systemBars());
@@ -292,7 +292,6 @@ public class BaiTapNho extends AppCompatActivity {
 
                 if (canNang <= 0) {
                     Toast.makeText(this, "Vui lòng cập nhật cân nặng để tính Calo chính xác!", Toast.LENGTH_SHORT).show();
-                    // Vẫn tiếp tục nhưng calo sẽ là 0 hoặc xử lý tùy ý, ở đây tôi giả định nếu không có cân nặng thì không tính calo
                 }
 
                 double tongCaloBaiTap = 0;

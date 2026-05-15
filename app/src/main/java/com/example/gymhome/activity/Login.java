@@ -32,7 +32,7 @@ public class Login extends AppCompatActivity {
             finish();
         }
 
-        setContentView(R.layout.activity_login);
+        super.setContentView(R.layout.activity_login);
 
         xacThucFirebase = FirebaseAuth.getInstance();
 

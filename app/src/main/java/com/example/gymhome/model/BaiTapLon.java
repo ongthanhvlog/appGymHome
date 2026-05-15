@@ -61,7 +61,7 @@ public class BaiTapLon implements Serializable {
         double total = 0;
         if (danhSachBaiTapNho != null) {
             for (BaiTapNho bt : danhSachBaiTapNho) {
-                total += bt.getMET() * canNang * (bt.getThoiGian() / 3600.0);
+                total += bt.tinhCalo(canNang);
             }
         }
         return total;

@@ -92,49 +92,58 @@
                 android:nestedScrollingEnabled="false"
                 android:padding="6dp" />
 
-            <TextView
-                android:id="@+id/textView11"
+            <RelativeLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:gravity="center_horizontal"
-                android:padding="10dp"
-                android:text="Bài viết mới"
-                android:textColor="#F00A0A"
-                android:textSize="20sp"
-                android:textStyle="bold" />
+                android:padding="10dp">
 
-            <androidx.cardview.widget.CardView
-                android:id="@+id/CV_BaiViet1"
+                <TextView
+                    android:id="@+id/textView11"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_centerInParent="true"
+                    android:text="Bài viết mới"
+                    android:textColor="#F00A0A"
+                    android:textSize="20sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/tvXemTatCaBaiViet"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true"
+                    android:text="Xem tất cả"
+                    android:textColor="#0000FF"
+                    android:textSize="14sp" />
+            </RelativeLayout>
+
+            <FrameLayout
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_margin="6dp"
-                app:cardCornerRadius="6dp">
+                android:layout_height="wrap_content">
 
-                <LinearLayout
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/rvBaiVietMoi"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="horizontal">
+                    android:nestedScrollingEnabled="false"
+                    android:padding="6dp" />
 
-                    <ImageView
-                        android:id="@+id/imageView8"
-                        android:layout_width="80dp"
-                        android:layout_height="80dp"
-                        android:padding="8dp"
-                        android:scaleType="centerCrop"
-                        android:src="@drawable/ic_launcher_background" />
+                <ProgressBar
+                    android:id="@+id/pbLoadingBaiViet"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:visibility="gone" />
 
-                    <TextView
-                        android:id="@+id/textView13"
-                        android:layout_width="0dp"
-                        android:layout_height="wrap_content"
-                        android:layout_gravity="center_vertical"
-                        android:layout_marginStart="8dp"
-                        android:layout_weight="1"
-                        android:text="Bài viết 1"
-                        android:textSize="18sp" />
-                </LinearLayout>
-
-            </androidx.cardview.widget.CardView>
+                <TextView
+                    android:id="@+id/tvErrorBaiViet"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:text="Không thể tải bài viết"
+                    android:visibility="gone" />
+            </FrameLayout>
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>
 </androidx.constraintlayout.widget.ConstraintLayout>

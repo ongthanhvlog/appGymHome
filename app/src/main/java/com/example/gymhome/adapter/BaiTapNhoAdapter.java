@@ -52,9 +52,7 @@ public class BaiTapNhoAdapter extends RecyclerView.Adapter<BaiTapNhoAdapter.View
         int soPhut = thoiGian / 60;
         holder.tvThoiGian.setText(soPhut + " phút");
 
-        // calo = MET * Cân nặng * Thời gian (giờ)
-        double met = item.getMET();
-        double calo = met * canNang * (thoiGian / 3600.0);
+        double calo = item.tinhCalo(canNang);
         holder.tvCalo.setText(String.format("%.1f kcal", calo));
 
         Glide.with(holder.itemView.getContext())
