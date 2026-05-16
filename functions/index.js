@@ -29,6 +29,7 @@ function lamSachNoiDung(text) {
     cleaned = cleaned.replace(/\s+/g, ' ').trim();
     return cleaned;
 }
+
 function getSourceName(url) {
     if (!url) return "";
     try {
@@ -89,6 +90,21 @@ function tachNoiDungBaiViet(html) {
     return { items, originalUrl, linkLogo };
 }
 
+function layNgayDangBaiViet($bm) {
+    const publishedTime =
+        $bm('meta[property="article:published_time"]').attr('content') ||
+        $bm('meta[name="pubdate"]').attr('content') ||
+        $bm('meta[itemprop="datePublished"]').attr('content') ||
+        $bm('time[itemprop="datePublished"]').attr('datetime') ||
+        $bm('time[datetime]').first().attr('datetime');
+
+    if (publishedTime) {
+        const parsed = new Date(publishedTime);
+        if (!isNaN(parsed.getTime())) return parsed.toISOString();
+    }
+    return new Date().toISOString();
+}
+
 async function dongBoBaiViet() {
     const db = admin.firestore();
     try {
@@ -121,7 +137,7 @@ async function dongBoBaiViet() {
                 rawBaiViet.push({ title, url });
             });
             const unique = Array.from(new Map(rawBaiViet.map(a => [a.url, a])).values());
-            for (const baiViet of unique.slice(0, 8)) {
+            for (const baiViet of unique.slice(0, 4)) {
                 try {
                     const cleanUrl = baiViet.url.split('?')[0];
                     const docId = Buffer.from(cleanUrl).toString('base64').substring(0, 40).replace(/[^a-zA-Z0-9]/g, '');
@@ -137,7 +153,6 @@ async function dongBoBaiViet() {
                             sourceName = ogSiteName;
                         }
                     }
-
                     if (!sourceName) sourceName = "Báo Mới";
 
                     let linkLogo = data.linkLogo;
@@ -147,6 +162,10 @@ async function dongBoBaiViet() {
                     }
 
                     const hinhAnhDaiDien = $bm('meta[property="og:image"]').attr('content') || "";
+
+                    // Lấy ngày đăng
+                    const ngayDang = layNgayDangBaiViet($bm);
+
                     let noiDungBaiViet = "";
                     let hasNoiDung = false;
 
@@ -168,16 +187,17 @@ async function dongBoBaiViet() {
                         tenBaiViet: baiViet.title,
                         moTa: baiViet.title,
                         hinhAnhDaiDien: hinhAnhDaiDien,
-                        ngayDang: new Date().toISOString(),
+                        ngayDang: ngayDang,
                         tag: topic.tag,
                         linkBaiViet: data.originalUrl || cleanUrl,
                         linkLogo: linkLogo,
-                        noiDung: noiDungBaiViet
+                        noiDung: noiDungBaiViet,
+                        trangThai: 0 // 1: vĩnh viễn, 0: tự động xóa sau 7 ngày
                     };
 
                     await db.collection("BaiViet").doc(docId).set(result);
                     count++;
-                    console.log(`Đã lưu: ${result.tenBaiViet} | Đoạn text: ${data.items.filter(i => i.type === 'text').length}`);
+                    console.log(`Đã lưu: ${result.tenBaiViet}`);
                     await new Promise(r => setTimeout(r, 1000));
                 } catch (e) { console.error(`Lỗi bài: ${e.message}`); }
             }
@@ -185,9 +205,108 @@ async function dongBoBaiViet() {
     }
     return { count };
 }
+
+//  Thêm bài viết từ một link BaoMoi cụ thể
+async function xyLyLinkBaiViet(baiVietUrl, tag) {
+    const db = admin.firestore();
+    const cleanUrl = baiVietUrl.split('?')[0];
+    const docId = Buffer.from(cleanUrl).toString('base64').substring(0, 40).replace(/[^a-zA-Z0-9]/g, '');
+
+    // Kiểm tra đã tồn tại chưa
+    const existing = await db.collection("BaiViet").doc(docId).get();
+    if (existing.exists) {
+        return { success: false, reason: "existed", docId };
+    }
+
+    const detailRes = await axios.get(baiVietUrl, { headers, timeout: 15000 });
+    const data = tachNoiDungBaiViet(detailRes.data);
+    const $bm = cheerio.load(detailRes.data);
+
+    const tenBaiViet =
+        $bm('meta[property="og:title"]').attr('content') ||
+        $bm('title').text().trim() ||
+        cleanUrl;
+
+    // Lấy mô tả
+    const moTa =
+        $bm('meta[property="og:description"]').attr('content') ||
+        $bm('meta[name="description"]').attr('content') ||
+        tenBaiViet;
+
+    let sourceName = data.originalUrl ? getSourceName(data.originalUrl) : "";
+    const ogSiteName = $bm('meta[property="og:site_name"]').attr('content');
+    if (!sourceName || sourceName === "Báo Mới") {
+        if (ogSiteName && !ogSiteName.toLowerCase().includes("baomoi")) {
+            sourceName = ogSiteName;
+        }
+    }
+    if (!sourceName) sourceName = "Báo Mới";
+
+    let linkLogo = data.linkLogo;
+    if (!linkLogo) {
+        const fallbackLogo = detailRes.data.match(/https:\/\/photo-baomoi\.bmcdn\.me\/[a-zA-Z0-9_\/]+\.png/i);
+        if (fallbackLogo) linkLogo = fallbackLogo[0];
+    }
+
+    const hinhAnhDaiDien = $bm('meta[property="og:image"]').attr('content') || "";
+
+    const ngayDang = layNgayDangBaiViet($bm);
+
+    let noiDungBaiViet = "";
+    let hasNoiDung = false;
+    data.items.forEach(item => {
+        if (item.type === "text") {
+            noiDungBaiViet += item.value + "\n\n";
+            hasNoiDung = true;
+        } else if (item.type === "image" && item.value !== hinhAnhDaiDien && item.value !== linkLogo) {
+            noiDungBaiViet += `[img]${item.value}[/img]\n\n`;
+            hasNoiDung = true;
+        }
+    });
+    if (noiDungBaiViet.length < 100 || !hasNoiDung) {
+        noiDungBaiViet = "Vui lòng truy cập nguồn để xem chi tiết.";
+    }
+
+    const result = {
+        tenBaiViet,
+        moTa,
+        hinhAnhDaiDien,
+        ngayDang: ngayDang,
+        tag: tag || "suckhoe",
+        linkBaiViet: data.originalUrl || cleanUrl,
+        linkLogo: linkLogo || "",
+        noiDung: noiDungBaiViet,
+        trangThai: 0 // 1: vĩnh viễn, 0: tự động xóa sau 7 ngày
+    };
+
+    await db.collection("BaiViet").doc(docId).set(result);
+    return { success: true, docId, tenBaiViet };
+}
+
 exports.triggerDongBoBaiViet = onRequest({ timeoutSeconds: 300, memory: "512MiB", cors: true }, async (req, res) => {
     try { const r = await dongBoBaiViet(); res.status(200).json(r); } catch (e) { res.status(500).send(e.message); }
 });
+
+exports.themBaiVietTuLink = onRequest({ timeoutSeconds: 60, memory: "256MiB", cors: true }, async (req, res) => {
+    try {
+        const url = req.query.url || req.body?.url;
+        const tag = req.query.tag || req.body?.tag || "suckhoe";
+        if (!url) {
+            return res.status(400).json({ success: false, reason: "Thiếu tham số url" });
+        }
+        const result = await xyLyLinkBaiViet(url, tag);
+        if (result.success) {
+            res.status(200).json(result);
+        } else if (result.reason === "existed") {
+            res.status(409).json(result); // 409 Conflict = đã tồn tại
+        } else {
+            res.status(500).json(result);
+        }
+    } catch (e) {
+        res.status(500).json({ success: false, reason: e.message });
+    }
+});
+
 exports.xoaAllBaiViet = onRequest(async (req, res) => {
     const snap = await admin.firestore().collection("BaiViet").get();
     const batch = admin.firestore().batch();
@@ -195,4 +314,54 @@ exports.xoaAllBaiViet = onRequest(async (req, res) => {
     await batch.commit();
     res.send("Đã xóa tất cả các bài viết!");
 });
+
 exports.dongBoBaiTapLuyen = onSchedule("every 30 minutes", async () => { await dongBoBaiViet(); });
+
+// Xóa các bài viết cũ hơn 7 ngày (trình bài viết có trangThai = 0)
+async function xoaBaiVietCu() {
+    const db = admin.firestore();
+    const bayNgayTruoc = new Date();
+    bayNgayTruoc.setDate(bayNgayTruoc.getDate() - 7);
+    const thoiDiemHetHan = bayNgayTruoc.toISOString();
+
+    const snapshot = await db.collection("BaiViet")
+        .where("ngayDang", "<", thoiDiemHetHan)
+        .get();
+
+    if (snapshot.empty) {
+        console.log("Không có bài viết cũ hơn 7 ngày.");
+        return 0;
+    }
+
+    const batch = db.batch();
+    let deletedCount = 0;
+    snapshot.docs.forEach(doc => {
+        const data = doc.data();
+        // Chỉ xóa nếu trangThai là 0 (tự động xóa)
+        if (data.trangThai === 0 || data.trangThai === undefined) {
+            batch.delete(doc.ref);
+            deletedCount++;
+        }
+    });
+
+    if (deletedCount > 0) {
+        await batch.commit();
+    }
+
+    console.log(`Đã xóa ${deletedCount} bài viết cũ.`);
+    return deletedCount;
+}
+
+// Tự động xóa vào lúc 0h00 hàng ngày
+exports.tuDongXoaBaiViet = onSchedule("0 0 * * *", async (event) => {
+    await xoaBaiVietCu();
+});
+
+exports.triggerXoaBaiVietCu = onRequest({ cors: true }, async (req, res) => {
+    try {
+        const count = await xoaBaiVietCu();
+        res.status(200).send(`Đã xóa ${count} bài viết cũ.`);
+    } catch (e) {
+        res.status(500).send(e.message);
+    }
+});
