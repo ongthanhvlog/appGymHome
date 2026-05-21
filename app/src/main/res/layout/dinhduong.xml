@@ -4,16 +4,17 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white">
+    android:background="#F5F7FA">
 
     <TextView
         android:id="@+id/titleDinhDuong"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginStart="32dp"
-        android:layout_marginTop="44dp"
+        android:layout_marginStart="28dp"
+        android:layout_marginTop="35dp"
         android:text="Trò chuyện cùng AI"
-        android:textSize="22sp"
+        android:textColor="@color/black"
+        android:textSize="28sp"
         android:textStyle="bold"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />

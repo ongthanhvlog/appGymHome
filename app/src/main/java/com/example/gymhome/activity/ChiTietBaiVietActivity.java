@@ -7,6 +7,7 @@ import android.webkit.WebView;
 import android.webkit.WebViewClient;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
@@ -14,6 +15,9 @@ import androidx.appcompat.widget.Toolbar;
 import com.bumptech.glide.Glide;
 import com.example.gymhome.R;
 import com.example.gymhome.model.BaiViet;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 public class ChiTietBaiVietActivity extends AppCompatActivity {
 
@@ -21,13 +25,16 @@ public class ChiTietBaiVietActivity extends AppCompatActivity {
     private TextView tvTenBaiViet, tvNgayDang, tvNguon;
     private WebView wvNoiDung;
     private com.google.android.material.button.MaterialButton btnViewOriginal;
-    private android.widget.ImageButton ibQuayLai;
+    private android.widget.ImageButton ibQuayLai, ibLuuBaiViet;
     private BaiViet baiViet;
+    private FirebaseFirestore db;
+    private String userId;
+    private boolean isSaved = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_chi_tiet_bai_viet);
+        setContentView(R.layout.chitietbaiviet);
 
         Toolbar toolbar = findViewById(R.id.toolbarDetail);
         setSupportActionBar(toolbar);
@@ -47,11 +54,61 @@ public class ChiTietBaiVietActivity extends AppCompatActivity {
         wvNoiDung = findViewById(R.id.wvNoiDung);
         wvNoiDung.setNestedScrollingEnabled(false);
         btnViewOriginal = findViewById(R.id.btnViewOriginal);
+        ibLuuBaiViet = findViewById(R.id.ibLuuBaiViet);
+
+        db = FirebaseFirestore.getInstance();
+        userId = FirebaseAuth.getInstance().getUid();
 
         baiViet = (BaiViet) getIntent().getSerializableExtra("BaiViet");
 
         if (baiViet != null) {
             hienThiChiTiet();
+            dongBoBaiVietDaLuu();
+        }
+
+        ibLuuBaiViet.setOnClickListener(v -> xuLyLuuBaiViet());
+    }
+
+    private void dongBoBaiVietDaLuu() {
+        if (userId == null || baiViet == null || baiViet.getId() == null) return;
+
+        db.collection("NguoiDung").document(userId)
+                .collection("BaiVietDaLuu").document(baiViet.getId())
+                .addSnapshotListener((value, error) -> {
+                    if (value != null && value.exists()) {
+                        isSaved = true;
+                        ibLuuBaiViet.setImageResource(R.drawable.ic_bookmark_filled);
+                        ibLuuBaiViet.setImageTintList(android.content.res.ColorStateList.valueOf(getResources().getColor(R.color.colorSaved)));
+                    } else {
+                        isSaved = false;
+                        ibLuuBaiViet.setImageResource(R.drawable.ic_bookmark_border);
+                        ibLuuBaiViet.setImageTintList(android.content.res.ColorStateList.valueOf(getResources().getColor(R.color.white)));
+                    }
+                });
+    }
+
+    private void xuLyLuuBaiViet() {
+        if (userId == null) {
+            Toast.makeText(this, "Vui lòng đăng nhập để lưu bài viết", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        if (baiViet == null || baiViet.getId() == null) {
+            Toast.makeText(this, "Không thể lưu bài viết này", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        DocumentReference docRef = db.collection("NguoiDung").document(userId)
+                .collection("BaiVietDaLuu").document(baiViet.getId());
+
+        if (isSaved) {
+            docRef.delete().addOnSuccessListener(aVoid -> {
+                Toast.makeText(this, "Đã bỏ lưu bài viết", Toast.LENGTH_SHORT).show();
+            });
+        } else {
+            docRef.set(baiViet).addOnSuccessListener(aVoid -> {
+                Toast.makeText(this, "Đã lưu bài viết", Toast.LENGTH_SHORT).show();
+            });
         }
     }
 

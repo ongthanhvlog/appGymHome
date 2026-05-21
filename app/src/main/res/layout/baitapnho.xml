@@ -162,7 +162,7 @@
             <ImageView
                 android:layout_width="20dp"
                 android:layout_height="20dp"
-                android:src="@android:drawable/ic_lock_silent_mode_off"
+                android:src="@drawable/ic_volume"
                 app:tint="#9E9E9E" />
 
             <SeekBar
@@ -193,13 +193,15 @@
 
                 <ImageButton
                     android:id="@+id/ibPrevious"
-                    android:layout_width="54dp"
-                    android:layout_height="54dp"
+                    android:layout_width="44dp"
+                    android:layout_height="44dp"
                     android:layout_marginEnd="20dp"
-                    android:background="?android:attr/selectableItemBackgroundBorderless"
-                    android:padding="12dp"
+                    android:background="@drawable/bg_rounded_white_12dp"
+                    android:elevation="2dp"
+                    android:padding="10dp"
                     android:scaleType="fitCenter"
-                    app:srcCompat="@drawable/ic_previous" />
+                    app:srcCompat="@drawable/ic_previous"
+                    app:tint="#1A1A1A" />
 
                 <ImageButton
                     android:id="@+id/ibPause"
@@ -214,27 +216,30 @@
 
                 <ImageButton
                     android:id="@+id/ibNext"
-                    android:layout_width="54dp"
-                    android:layout_height="54dp"
+                    android:layout_width="44dp"
+                    android:layout_height="44dp"
                     android:layout_marginStart="20dp"
-                    android:background="?android:attr/selectableItemBackgroundBorderless"
-                    android:padding="12dp"
+                    android:background="@drawable/bg_rounded_white_12dp"
+                    android:elevation="2dp"
+                    android:padding="10dp"
                     android:scaleType="fitCenter"
-                    app:srcCompat="@drawable/ic_next" />
+                    app:srcCompat="@drawable/ic_next"
+                    app:tint="#1A1A1A" />
             </LinearLayout>
 
             <ImageButton
                 android:id="@+id/ibLapLaiBaiTap"
                 android:layout_width="44dp"
                 android:layout_height="44dp"
-                android:background="?android:attr/selectableItemBackgroundBorderless"
-                android:padding="8dp"
+                android:background="@drawable/bg_rounded_white_12dp"
+                android:elevation="2dp"
+                android:padding="10dp"
                 android:scaleType="fitCenter"
                 android:src="@android:drawable/ic_menu_revert"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="parent"
-                app:tint="#9E9E9E" />
+                app:tint="#1A1A1A" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </LinearLayout>

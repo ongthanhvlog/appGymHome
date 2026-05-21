@@ -27,8 +27,10 @@ import java.util.List;
 import android.util.Log;
 import com.example.gymhome.adapter.BaiVietAdapter;
 import com.example.gymhome.model.BaiViet;
+import com.google.firebase.auth.FirebaseAuth;
 
 import android.widget.ProgressBar;
+import android.widget.Toast;
 
 public class TrangChu_Fragment extends Fragment {
 
@@ -42,7 +44,8 @@ public class TrangChu_Fragment extends Fragment {
     private FirebaseFirestore db;
     private TextView tvXemTatCaThuThach, tvXemTatCaBaiViet, tvErrorBaiViet;
     private ProgressBar pbLoadingBaiViet;
-    private com.google.firebase.firestore.ListenerRegistration vungTapTrungListener, thuThachListener, baiVietListener;
+    private String userId;
+    private com.google.firebase.firestore.ListenerRegistration vungTapTrungListener, thuThachListener, baiVietListener, LuuBaiVietListener;
 
     public TrangChu_Fragment() {
     }
@@ -53,6 +56,7 @@ public class TrangChu_Fragment extends Fragment {
 
         View view = inflater.inflate(R.layout.trangchu, container, false);
         db = FirebaseFirestore.getInstance();
+        userId = FirebaseAuth.getInstance().getUid();
 
         // Setup UI
         rvVungTapTrung = view.findViewById(R.id.rvVungTapTrung);
@@ -90,6 +94,7 @@ public class TrangChu_Fragment extends Fragment {
             intent.putExtra("BaiViet", item);
             startActivity(intent);
         });
+        baiVietAdapter.setOnSaveClickListener(this::toggleLuuBaiViet);
         rvBaiVietMoi.setAdapter(baiVietAdapter);
 
         tvXemTatCaBaiViet.setOnClickListener(v -> startActivity(new Intent(getActivity(), com.example.gymhome.activity.DanhSachBaiVietActivity.class)));
@@ -100,8 +105,49 @@ public class TrangChu_Fragment extends Fragment {
         loadVungTapTrungData();
         loadThuThachData();
         loadBaiVietData();
+        syncLuuBaiViet();
 
         return view;
+    }
+
+    private void syncLuuBaiViet() {
+        if (userId == null) return;
+        LuuBaiVietListener = db.collection("NguoiDung").document(userId)
+                .collection("BaiVietDaLuu")
+                .addSnapshotListener((value, error) -> {
+                    if (!isAdded() || error != null) return;
+                    if (value != null) {
+                        List<String> savedIds = new ArrayList<>();
+                        for (QueryDocumentSnapshot doc : value) {
+                            savedIds.add(doc.getId());
+                        }
+                        baiVietAdapter.setDanhSachIdDaLuu(savedIds);
+                    }
+                });
+    }
+
+    private void toggleLuuBaiViet(BaiViet item, boolean isSaved) {
+        if (userId == null) {
+            Toast.makeText(getContext(), "Vui lòng đăng nhập để lưu bài viết", Toast.LENGTH_SHORT).show();
+            return;
+        }
+        if (item.getId() == null) return;
+
+        if (isSaved) {
+            db.collection("NguoiDung").document(userId)
+                    .collection("BaiVietDaLuu").document(item.getId())
+                    .delete()
+                    .addOnSuccessListener(aVoid -> {
+                        if (isAdded()) Toast.makeText(getContext(), "Đã bỏ lưu", Toast.LENGTH_SHORT).show();
+                    });
+        } else {
+            db.collection("NguoiDung").document(userId)
+                    .collection("BaiVietDaLuu").document(item.getId())
+                    .set(item)
+                    .addOnSuccessListener(aVoid -> {
+                        if (isAdded()) Toast.makeText(getContext(), "Đã lưu bài viết", Toast.LENGTH_SHORT).show();
+                    });
+        }
     }
 
     private void loadThuThachData() {
@@ -166,6 +212,7 @@ public class TrangChu_Fragment extends Fragment {
                         danhSachBaiViet.clear();
                         for (QueryDocumentSnapshot document : value) {
                             BaiViet item = document.toObject(BaiViet.class);
+                            item.setId(document.getId());
                             danhSachBaiViet.add(item);
                         }
                         baiVietAdapter.notifyDataSetChanged();
@@ -179,5 +226,6 @@ public class TrangChu_Fragment extends Fragment {
         if (vungTapTrungListener != null) vungTapTrungListener.remove();
         if (thuThachListener != null) thuThachListener.remove();
         if (baiVietListener != null) baiVietListener.remove();
+        if (LuuBaiVietListener != null) LuuBaiVietListener.remove();
     }
 }

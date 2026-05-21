@@ -52,6 +52,9 @@
             android:name=".activity.ChiTietBaiVietActivity"
             android:exported="false" />
         <activity
+            android:name=".activity.BaiVietDaLuuActivity"
+            android:exported="false" />
+        <activity
             android:name=".activity.Register"
             android:exported="false" />
         <activity

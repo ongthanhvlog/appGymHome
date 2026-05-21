@@ -118,7 +118,8 @@ async function dongBoBaiViet() {
     } catch (e) {}
     const topics = [
         { url: "https://baomoi.com/suc-khoe-y-te.epi", tag: "suckhoe" },
-        { url: "https://baomoi.com/the-thao.epi", tag: "tapluyen" },
+        //{ url: "https://baomoi.com/the-thao.epi", tag: "tapluyen" },
+        { url: "https://baomoi.com/tap-luyen.epi", tag: "tapluyen" },
         { url: "https://baomoi.com/dinh-duong-lam-dep.epi", tag: "dinhduong" }
     ];
     let count = 0;
