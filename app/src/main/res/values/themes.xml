@@ -2,8 +2,22 @@
     <!-- Base application theme. -->
     <style name="Base.Theme.GymHome" parent="Theme.Material3.DayNight.NoActionBar">
         <!-- Customize your light theme here. -->
-        <!-- <item name="colorPrimary">@color/my_light_primary</item> -->
+        <item name="colorPrimary">@color/orange_main</item>
+        <item name="android:statusBarColor">@color/orange_main</item>
+        <item name="android:windowBackground">#F5F7FA</item>
     </style>
 
     <style name="Theme.GymHome" parent="Base.Theme.GymHome" />
+
+    <style name="SearchViewStyle" parent="Widget.AppCompat.SearchView">
+        <item name="colorControlNormal">@color/orange_main</item>
+    </style>
+
+    <style name="RoundedCorner12dp">
+        <item name="cornerSize">12dp</item>
+    </style>
+
+    <style name="CircleImage">
+        <item name="cornerSize">50%</item>
+    </style>
 </resources>

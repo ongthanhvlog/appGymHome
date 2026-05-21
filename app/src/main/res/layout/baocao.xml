@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F5F5F5"
+    android:background="#F5F7FA"
     tools:context=".fragment.BaoCao_Fragment">
 
     <LinearLayout
@@ -17,6 +17,8 @@
             android:id="@+id/titleBaoCao"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_marginStart="12dp"
+            android:layout_marginTop="35dp"
             android:layout_marginBottom="16dp"
             android:text="Báo cáo"
             android:textColor="@color/black"

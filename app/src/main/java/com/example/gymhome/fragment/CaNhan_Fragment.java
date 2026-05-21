@@ -1,7 +1,6 @@
 package com.example.gymhome.fragment;
 
 import android.app.AlertDialog;
-import android.app.Dialog;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
@@ -28,6 +27,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.gymhome.R;
+import com.example.gymhome.activity.BaiVietDaLuuActivity;
 import com.example.gymhome.activity.Login;
 import com.example.gymhome.adapter.ChamSocKhachHangAdapter;
 import com.example.gymhome.model.ChamSocKhachHang;
@@ -36,7 +36,6 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.ListenerRegistration;
-import com.google.firebase.firestore.Query;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
 import java.util.ArrayList;
@@ -48,7 +47,7 @@ public class CaNhan_Fragment extends Fragment {
     // View
     TextView tvEmail;
     Button btnDangXuat, btnDoiMatKhau;
-    LinearLayout layoutDanhGia;
+    LinearLayout layoutDanhGia, layoutBaiVietDaLuu;
 
     // Firebase
     FirebaseAuth xacThucFirebase;
@@ -58,7 +57,7 @@ public class CaNhan_Fragment extends Fragment {
     // Listener & Adapter cho dialog
     ListenerRegistration yeuCauListener;
     ChamSocKhachHangAdapter adapter;
-    List<ChamSocKhachHang> dsYeuCau;
+    List<ChamSocKhachHang> danhSachYeuCau;
 
     @Nullable
     @Override
@@ -88,6 +87,12 @@ public class CaNhan_Fragment extends Fragment {
         // Sự kiện Đánh giá/Yêu cầu
         layoutDanhGia.setOnClickListener(v -> hienThiDialogDanhSachYeuCau());
 
+        // Sự kiện Bài viết đã lưu
+        layoutBaiVietDaLuu.setOnClickListener(v -> {
+            Intent intent = new Intent(getActivity(), BaiVietDaLuuActivity.class);
+            startActivity(intent);
+        });
+
         return giaoDien;
     }
 
@@ -97,6 +102,7 @@ public class CaNhan_Fragment extends Fragment {
         btnDangXuat = giaoDien.findViewById(R.id.btnDangXuat);
         btnDoiMatKhau = giaoDien.findViewById(R.id.btnDoiMatKhau);
         layoutDanhGia = giaoDien.findViewById(R.id.layoutDanhGia);
+        layoutBaiVietDaLuu = giaoDien.findViewById(R.id.layoutBaiVietDaLuu);
     }
 
     // HIỂN THỊ EMAIL NGƯỜI DÙNG
@@ -197,7 +203,7 @@ public class CaNhan_Fragment extends Fragment {
     private void hienThiDialogDanhSachYeuCau() {
         android.app.Dialog dialog = new android.app.Dialog(getContext());
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-        dialog.setContentView(R.layout.dialog_danh_sach_yeu_cau);
+        dialog.setContentView(R.layout.dialog_dsyeucau);
 
         Window window = dialog.getWindow();
         if (window != null) {
@@ -211,8 +217,8 @@ public class CaNhan_Fragment extends Fragment {
         RecyclerView rvDanhSachYeuCau = dialog.findViewById(R.id.rvDanhSachYeuCau);
         Button btnThemYeuCau = dialog.findViewById(R.id.btnThemYeuCau);
 
-        dsYeuCau = new ArrayList<>();
-        adapter = new ChamSocKhachHangAdapter(getContext(), dsYeuCau);
+        danhSachYeuCau = new ArrayList<>();
+        adapter = new ChamSocKhachHangAdapter(getContext(), danhSachYeuCau);
         rvDanhSachYeuCau.setLayoutManager(new LinearLayoutManager(getContext()));
         rvDanhSachYeuCau.setAdapter(adapter);
 
@@ -250,21 +256,21 @@ public class CaNhan_Fragment extends Fragment {
                     }
 
                     if (value != null) {
-                        dsYeuCau.clear();
+                        danhSachYeuCau.clear();
                         for (QueryDocumentSnapshot doc : value) {
                             ChamSocKhachHang item = doc.toObject(ChamSocKhachHang.class);
                             item.setId(doc.getId());
-                            dsYeuCau.add(item);
+                            danhSachYeuCau.add(item);
                         }
 
                         // Sắp xếp danh sách cục bộ (Mới nhất lên đầu)
-                        Collections.sort(dsYeuCau, (o1, o2) -> {
+                        Collections.sort(danhSachYeuCau, (o1, o2) -> {
                             if (o1.getThoiGianTao() == null || o2.getThoiGianTao() == null) return 0;
                             return o2.getThoiGianTao().compareTo(o1.getThoiGianTao());
                         });
 
                         adapter.notifyDataSetChanged();
-                        android.util.Log.d("FIRESTORE_SYNC", "Đã cập nhật " + dsYeuCau.size() + " yêu cầu");
+                        android.util.Log.d("FIRESTORE_SYNC", "Đã cập nhật " + danhSachYeuCau.size() + " yêu cầu");
                     }
                 });
     }
@@ -273,7 +279,7 @@ public class CaNhan_Fragment extends Fragment {
     private void hienThiDialogThemYeuCau() {
         android.app.Dialog dialog = new android.app.Dialog(getContext());
         dialog.requestWindowFeature(Window.FEATURE_NO_TITLE);
-        dialog.setContentView(R.layout.dialog_them_yeu_cau);
+        dialog.setContentView(R.layout.dialog_themyeucau);
 
         Window window = dialog.getWindow();
         if (window != null) {

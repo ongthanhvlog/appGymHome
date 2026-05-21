@@ -4,6 +4,7 @@ import com.google.firebase.firestore.PropertyName;
 import java.io.Serializable;
 
 public class BaiViet implements Serializable {
+    private String id;
     private String tenBaiViet;
     private String moTa;
     private String noiDung;
@@ -14,6 +15,14 @@ public class BaiViet implements Serializable {
     private String tag;
 
     public BaiViet() {}
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
+    }
 
     @PropertyName("tenBaiViet")
     public String getTenBaiViet() {

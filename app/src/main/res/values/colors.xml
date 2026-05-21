@@ -7,4 +7,19 @@
     <color name="mau_icon_chon">#F44336</color>
     <color name="mau_icon_mac_dinh">#555555</color>
 
+    <!-- Màu Tags Bài Viết -->
+    <color name="tag_dinhduong">#FA8C16</color>
+    <color name="tag_suckhoe">#0958D9</color>
+    <color name="tag_tapluyen">#389E0D</color>
+    <color name="tag_default">#8C8C8C</color>
+
+    <!-- Màu Theme Hiện Đại -->
+    <color name="purple_main">#6A54B0</color>
+    <color name="purple_gradient_end">#8E78D8</color>
+    <color name="bg_light_gray">#F8F9FE</color>
+    <color name="text_gray">#757575</color>
+    <color name="colorSaved">#FFD600</color>
+    <color name="orange_main">#FF5252</color>
+
+
 </resources>

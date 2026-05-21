@@ -1,0 +1,178 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/white"
+    android:fitsSystemWindows="true">
+
+    <androidx.core.widget.NestedScrollView
+        android:id="@+id/nestedScrollView"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:fillViewport="true"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <ImageView
+                android:id="@+id/imgHinhAnhDaiDien"
+                android:layout_width="match_parent"
+                android:layout_height="240dp"
+                android:scaleType="centerCrop"
+                tools:src="@drawable/ic_launcher_background" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="20dp">
+
+                <TextView
+                    android:id="@+id/tvTenBaiViet"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:textColor="@android:color/black"
+                    android:textSize="22sp"
+                    android:textStyle="bold"
+                    tools:text="Tiêu đề bài viết" />
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <TextView
+                        android:id="@+id/tvNgayDang"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textColor="@android:color/darker_gray"
+                        android:textSize="13sp"
+                        tools:text="01/01/2024" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="12dp"
+                        android:text="Nguồn :"
+                        android:textColor="@android:color/darker_gray"
+                        android:textSize="13sp" />
+
+                    <ImageView
+                        android:id="@+id/imgLinkLogo"
+                        android:layout_width="wrap_content"
+                        android:layout_height="16dp"
+                        android:layout_marginStart="6dp"
+                        android:adjustViewBounds="true"
+                        android:scaleType="fitCenter" />
+
+                    <TextView
+                        android:id="@+id/tvNguon"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="4dp"
+                        android:textColor="#1976D2"
+                        android:textSize="13sp"
+                        android:textStyle="italic"
+                        tools:text="GymHome" />
+                </LinearLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginBottom="16dp"
+                    android:background="#EEEEEE" />
+
+                <WebView
+                    android:id="@+id/wvNoiDung"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:overScrollMode="never" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnViewOriginal"
+                    style="@style/Widget.Material3.Button.TextButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:layout_marginTop="24dp"
+                    android:text="Xem bài viết gốc tại nguồn"
+                    android:textColor="#FF4081"
+                    android:visibility="gone"
+                    app:icon="@android:drawable/ic_menu_send" />
+
+            </LinearLayout>
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
+    <androidx.appcompat.widget.Toolbar
+        android:id="@+id/toolbarDetail"
+        android:layout_width="match_parent"
+        android:layout_height="70dp"
+        android:background="@android:color/transparent"
+        app:contentInsetStart="0dp"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardBack"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_marginStart="16dp"
+                app:cardCornerRadius="8dp"
+                app:cardElevation="0dp"
+                app:strokeWidth="0.5dp"
+                app:strokeColor="#DDDDDD"
+                app:cardBackgroundColor="#F5F5F5"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <ImageButton
+                    android:id="@+id/ibQuayLai"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@android:color/transparent"
+                    android:padding="8dp"
+                    android:scaleType="fitCenter"
+                    app:srcCompat="@drawable/ic_back" />
+            </com.google.android.material.card.MaterialCardView>
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardSave"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_marginEnd="16dp"
+                app:cardCornerRadius="8dp"
+                app:cardElevation="0dp"
+                app:strokeWidth="0.5dp"
+                app:strokeColor="#DDDDDD"
+                app:cardBackgroundColor="#F5F5F5"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="parent">
+
+                <ImageButton
+                    android:id="@+id/ibLuuBaiViet"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@android:color/transparent"
+                    android:padding="8dp"
+                    android:scaleType="fitCenter"
+                    app:srcCompat="@drawable/ic_bookmark_border" />
+            </com.google.android.material.card.MaterialCardView>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.appcompat.widget.Toolbar>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

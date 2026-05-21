@@ -1,13 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+<com.google.android.material.card.MaterialCardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:layout_marginHorizontal="12dp"
     android:layout_marginVertical="8dp"
     app:cardCornerRadius="16dp"
-    app:cardElevation="6dp"
-    app:cardMaxElevation="8dp">
+    app:cardElevation="4dp"
+    app:cardMaxElevation="6dp"
+    app:cardBackgroundColor="@android:color/white"
+    app:strokeWidth="0dp">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -16,16 +19,46 @@
 
         <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="200dp">
+            android:layout_height="180dp">
 
             <ImageView
                 android:id="@+id/imgHinhAnhDaiDien"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:scaleType="centerCrop"
-                android:src="@drawable/ic_launcher_background" />
+                tools:src="@drawable/ic_launcher_background" />
 
-            <!-- tvTag removed as requested -->
+            <LinearLayout
+                android:id="@+id/llTag"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentTop="true"
+                android:layout_margin="12dp"
+                android:background="@drawable/bg_rounded_white_12dp"
+                android:backgroundTint="#8C8C8C"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:paddingHorizontal="10dp"
+                android:paddingVertical="6dp">
+
+                <ImageView
+                    android:id="@+id/imgTagIcon"
+                    android:layout_width="14dp"
+                    android:layout_height="14dp"
+                    android:src="@drawable/ic_health"
+                    app:tint="@color/white" />
+
+                <TextView
+                    android:id="@+id/tvTag"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="4dp"
+                    android:text="Sức khỏe"
+                    android:textColor="@color/white"
+                    android:textSize="11sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
         </RelativeLayout>
 
         <LinearLayout
@@ -33,6 +66,16 @@
             android:layout_height="wrap_content"
             android:orientation="vertical"
             android:padding="16dp">
+
+            <TextView
+                android:id="@+id/tvCategoryLabel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="DINH DƯỠNG"
+                android:textColor="@color/orange_main"
+                android:textSize="10sp"
+                android:textStyle="bold"
+                android:visibility="gone" />
 
             <TextView
                 android:id="@+id/tvTenBaiViet"
@@ -54,59 +97,55 @@
                 android:orientation="horizontal">
 
                 <ImageView
-                    android:id="@+id/ic_clock"
                     android:layout_width="14dp"
                     android:layout_height="14dp"
                     android:alpha="0.5"
-                    android:src="@android:drawable/ic_menu_recent_history" />
+                    android:src="@drawable/ic_publish_date" />
 
                 <TextView
                     android:id="@+id/tvNgayDang"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="4dp"
-                    android:text="Ngày đăng: 12/05/2024"
+                    android:text="20/05/2026"
                     android:textColor="#9E9E9E"
-                    android:textSize="12sp" />
+                    android:textSize="11sp" />
 
                 <TextView
-                    android:id="@+id/tvSourceLabel"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginStart="12dp"
-                    android:text="Nguồn :"
+                    android:layout_marginStart="8dp"
+                    android:text="|"
+                    android:textColor="#E0E0E0"
+                    android:textSize="11sp" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:text="Nguồn:"
                     android:textColor="#9E9E9E"
-                    android:textSize="12sp" />
+                    android:textSize="11sp" />
 
                 <ImageView
                     android:id="@+id/imgLinkLogo"
                     android:layout_width="wrap_content"
                     android:layout_height="14dp"
-                    android:layout_marginStart="6dp"
+                    android:layout_marginStart="4dp"
                     android:adjustViewBounds="true"
-                    android:scaleType="fitCenter" />
+                    android:scaleType="fitCenter"
+                    android:visibility="gone" />
 
                 <TextView
                     android:id="@+id/tvSource"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="4dp"
-                    android:text="GymHome"
-                    android:textColor="#1976D2"
-                    android:textSize="12sp"
-                    android:textStyle="italic" />
+                    android:text="SỨC KHỎE &amp; ĐỜI SỐNG"
+                    android:textColor="#2E7D32"
+                    android:textSize="11sp"
+                    android:textStyle="bold" />
             </LinearLayout>
-
-            <TextView
-                android:id="@+id/tvMoTa"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:ellipsize="end"
-                android:maxLines="2"
-                android:text="Mô tả chi tiết bài viết giúp người dùng nắm bắt thông tin nhanh chóng và lôi cuốn hơn."
-                android:textColor="#757575"
-                android:textSize="14sp" />
 
             <View
                 android:layout_width="match_parent"
@@ -114,15 +153,65 @@
                 android:layout_marginTop="12dp"
                 android:background="#F5F5F5" />
 
-            <TextView
-                android:layout_width="wrap_content"
+            <RelativeLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_gravity="end"
-                android:layout_marginTop="10dp"
-                android:text="Đọc thêm →"
-                android:textColor="#FF4081"
-                android:textSize="12sp"
-                android:textStyle="bold" />
+                android:layout_marginTop="10dp">
+
+                <LinearLayout
+                    android:id="@+id/llSave"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentStart="true"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:background="?attr/selectableItemBackground">
+
+                    <ImageView
+                        android:id="@+id/imgSaveIcon"
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:src="@drawable/ic_bookmark_border"
+                        app:tint="#424242" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="8dp"
+                        android:text="Lưu bài viết"
+                        android:textColor="#424242"
+                        android:textSize="12sp" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/llReadMore"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentEnd="true"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:background="?attr/selectableItemBackground">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Đọc thêm"
+                        android:textColor="@color/orange_main"
+                        android:textSize="12sp"
+                        android:textStyle="bold" />
+
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:layout_marginStart="4dp"
+                        android:src="@drawable/ic_chevron_right"
+                        app:tint="@color/orange_main" />
+                </LinearLayout>
+            </RelativeLayout>
         </LinearLayout>
     </LinearLayout>
-</androidx.cardview.widget.CardView>
+</com.google.android.material.card.MaterialCardView>
