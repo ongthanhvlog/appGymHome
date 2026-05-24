@@ -105,7 +105,7 @@ function layNgayDangBaiViet($bm) {
     return new Date().toISOString();
 }
 
-async function dongBoBaiViet() {
+async function xuLyCapNhatBaiVietMoi() {
     const db = admin.firestore();
     try {
         const keywordDoc = await db.collection("TuKhoa").doc("config").get();
@@ -284,8 +284,8 @@ async function xyLyLinkBaiViet(baiVietUrl, tag) {
     return { success: true, docId, tenBaiViet };
 }
 
-exports.triggerDongBoBaiViet = onRequest({ timeoutSeconds: 300, memory: "512MiB", cors: true }, async (req, res) => {
-    try { const r = await dongBoBaiViet(); res.status(200).json(r); } catch (e) { res.status(500).send(e.message); }
+exports.triggerCapNhatBaiVietMoi = onRequest({ timeoutSeconds: 300, memory: "512MiB", cors: true }, async (req, res) => {
+    try { const r = await xuLyCapNhatBaiVietMoi(); res.status(200).json(r); } catch (e) { res.status(500).send(e.message); }
 });
 
 exports.themBaiVietTuLink = onRequest({ timeoutSeconds: 60, memory: "256MiB", cors: true }, async (req, res) => {
@@ -316,7 +316,7 @@ exports.xoaAllBaiViet = onRequest(async (req, res) => {
     res.send("Đã xóa tất cả các bài viết!");
 });
 
-exports.dongBoBaiTapLuyen = onSchedule("every 30 minutes", async () => { await dongBoBaiViet(); });
+exports.tuDongCapNhatBaiVietMoi = onSchedule("every 30 minutes", async () => { await xuLyCapNhatBaiVietMoi(); });
 
 // Xóa các bài viết cũ hơn 7 ngày (trình bài viết có trangThai = 0)
 async function xoaBaiVietCu() {
@@ -366,3 +366,23 @@ exports.triggerXoaBaiVietCu = onRequest({ cors: true }, async (req, res) => {
         res.status(500).send(e.message);
     }
 });
+//  Xóa bài viết chưa lưu
+exports.triggerXoaBaiVietChuaLuu = onRequest({ cors: true }, async (req, res) => {
+    try {
+        const db = admin.firestore();
+        const snapshot = await db.collection("BaiViet").get();
+        const batch = db.batch();
+        let count = 0;
+        snapshot.docs.forEach(doc => {
+            if (doc.data().trangThai !== 1) {
+                batch.delete(doc.ref);
+                count++;
+            }
+        });
+        if (count > 0) await batch.commit();
+        res.status(200).json({ success: true, message: `Đã xóa ${count} bài viết chưa lưu.` });
+    } catch (e) {
+        res.status(500).json({ success: false, reason: e.message });
+    }
+});
+
