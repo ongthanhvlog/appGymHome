@@ -51,13 +51,13 @@ public class DanhSachThuThach extends AppCompatActivity {
         db = FirebaseFirestore.getInstance();
         rvTatCaThuThach.setLayoutManager(new LinearLayoutManager(this));
         danhSachThuThach = new ArrayList<>();
-        loadCanNangNguoiDung();
         adapter = new ThuThachAdapter(danhSachThuThach, canNang, item -> {
             android.content.Intent intent = new android.content.Intent(DanhSachThuThach.this, ChiTietThuThach.class);
             intent.putExtra("ThuThachData", item);
             startActivity(intent);
         });
         rvTatCaThuThach.setAdapter(adapter);
+        loadCanNangNguoiDung();
         loadAllThuThach();
     }
 
