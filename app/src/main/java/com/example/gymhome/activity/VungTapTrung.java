@@ -19,6 +19,8 @@ import com.bumptech.glide.Glide;
 import com.example.gymhome.R;
 import com.example.gymhome.adapter.BaiTapLonAdapter;
 import com.example.gymhome.model.BaiTapLon;
+import com.example.gymhome.model.BaiTapNho;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 
@@ -34,6 +36,7 @@ public class VungTapTrung extends AppCompatActivity {
     private List<BaiTapLon> baiTapLonList;
     private FirebaseFirestore db;
     private String vungId;
+    private double canNang = 0.0;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -66,17 +69,35 @@ public class VungTapTrung extends AppCompatActivity {
         db = FirebaseFirestore.getInstance();
         baiTapLonList = new ArrayList<>();
         rvBaiTapLon.setLayoutManager(new LinearLayoutManager(this));
-        adapter = new BaiTapLonAdapter(baiTapLonList, item -> {
+        adapter = new BaiTapLonAdapter(baiTapLonList, canNang, item -> {
             Intent intent = new Intent(VungTapTrung.this, DangKyBaiTapLon.class);
             intent.putExtra("BaiTapLon", item);
             intent.putExtra("VungId", vungId);
             startActivity(intent);
         });
         rvBaiTapLon.setAdapter(adapter);
+        loadCanNangNguoiDung();
         ibQuayLai.setOnClickListener(v -> finish());
         if (vungId != null) {
             loadDanhSachBaiTapLon();
         }
+    }
+
+    private void loadCanNangNguoiDung() {
+        String userId = FirebaseAuth.getInstance().getUid();
+        if (userId == null) return;
+        db.collection("NguoiDung").document(userId).get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    if (documentSnapshot.exists()) {
+                        Double canNangVal = documentSnapshot.getDouble("ThongTinNguoiDung.CanNang");
+                        if (canNangVal != null) {
+                            this.canNang = canNangVal;
+                            if (adapter != null) {
+                                adapter.setCanNang(this.canNang);
+                            }
+                        }
+                    }
+                });
     }
 
     private void loadDanhSachBaiTapLon() {
@@ -91,11 +112,29 @@ public class VungTapTrung extends AppCompatActivity {
                             BaiTapLon item = document.toObject(BaiTapLon.class);
                             item.setId(document.getId());
                             baiTapLonList.add(item);
+                            loadBaiTapNhoChoBTL(item);
                         }
                         adapter.notifyDataSetChanged();
                     } else {
                         Toast.makeText(this, "Lỗi: " + task.getException().getMessage(), Toast.LENGTH_SHORT).show();
                     }
+                });
+    }
+
+    private void loadBaiTapNhoChoBTL(BaiTapLon btl) {
+        db.collection("VungTapTrung")
+                .document(vungId)
+                .collection("DanhSachBaiTapLon")
+                .document(btl.getId())
+                .collection("DanhSachBaiTapNho")
+                .get()
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+                    List<BaiTapNho> listNho = new ArrayList<>();
+                    for (QueryDocumentSnapshot doc : queryDocumentSnapshots) {
+                        listNho.add(doc.toObject(BaiTapNho.class));
+                    }
+                    btl.setDanhSachBaiTapNho(listNho);
+                    adapter.notifyDataSetChanged();
                 });
     }
 }

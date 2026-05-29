@@ -92,7 +92,8 @@ public class BaiTapLonAdapter extends RecyclerView.Adapter<BaiTapLonAdapter.View
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
-        ImageView ivHinhAnh, btnHuy;
+        ImageView ivHinhAnh;
+        View btnHuy;
         TextView tvTen, tvCapDo, tvThoiGian, tvCalo;
 
         public ViewHolder(@NonNull View itemView) {

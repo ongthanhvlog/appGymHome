@@ -109,16 +109,30 @@
             </LinearLayout>
         </LinearLayout>
 
-        <ImageView
+        <com.google.android.material.card.MaterialCardView
             android:id="@+id/btnHuyDangKyBaiTapLon"
-            android:layout_width="24dp"
-            android:layout_height="24dp"
+            android:layout_width="36dp"
+            android:layout_height="36dp"
             android:layout_marginEnd="8dp"
-            android:src="@drawable/ic_delete"
+            android:clickable="true"
+            android:focusable="true"
             android:visibility="gone"
+            app:cardBackgroundColor="@android:color/white"
+            app:cardCornerRadius="10dp"
+            app:cardElevation="2dp"
+            app:strokeWidth="0dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toStartOf="@+id/ivXemChiTiet"
-            app:layout_constraintTop_toTopOf="parent" />
+            app:layout_constraintTop_toTopOf="parent">
+
+            <ImageView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:padding="8dp"
+                android:scaleType="centerInside"
+                android:src="@drawable/ic_delete"
+                app:tint="#FF5252" />
+        </com.google.android.material.card.MaterialCardView>
 
         <ImageView
             android:id="@+id/ivXemChiTiet"

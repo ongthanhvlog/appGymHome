@@ -45,6 +45,7 @@ public class TrangChu_Fragment extends Fragment {
     private TextView tvXemTatCaThuThach, tvXemTatCaBaiViet, tvErrorBaiViet;
     private ProgressBar pbLoadingBaiViet;
     private String userId;
+    private double canNang = 0.0;
     private com.google.firebase.firestore.ListenerRegistration vungTapTrungListener, thuThachListener, baiVietListener, LuuBaiVietListener;
 
     public TrangChu_Fragment() {
@@ -102,12 +103,91 @@ public class TrangChu_Fragment extends Fragment {
         tvXemTatCaThuThach = view.findViewById(R.id.tvXemTatCaThuThach);
         tvXemTatCaThuThach.setOnClickListener(v -> startActivity(new Intent(getActivity(), com.example.gymhome.activity.DanhSachThuThach.class)));
 
+        view.findViewById(R.id.ibThongBao).setOnClickListener(this::hienThiPopUpThongBao);
+
+        loadCanNangNguoiDung();
         loadVungTapTrungData();
         loadThuThachData();
         loadBaiVietData();
         syncLuuBaiViet();
 
         return view;
+    }
+
+    private void hienThiPopUpThongBao(View anchorView) {
+        View popupView = getLayoutInflater().inflate(R.layout.layout_thong_bao_pop_up, null);
+        
+        android.widget.PopupWindow popupWindow = new android.widget.PopupWindow(
+                popupView,
+                android.view.ViewGroup.LayoutParams.WRAP_CONTENT,
+                android.view.ViewGroup.LayoutParams.WRAP_CONTENT,
+                true
+        );
+
+        // Thiết lập RecyclerView trong Popup
+        RecyclerView rv = popupView.findViewById(R.id.rvThongBaoPopUp);
+        ProgressBar pb = popupView.findViewById(R.id.pbLoadingPopUp);
+        TextView tvEmpty = popupView.findViewById(R.id.tvEmptyPopUp);
+
+        List<com.example.gymhome.model.ThongBao> listPopUp = new ArrayList<>();
+        com.example.gymhome.adapter.ThongBaoAdapter adapterPopUp = new com.example.gymhome.adapter.ThongBaoAdapter(listPopUp);
+        rv.setLayoutManager(new androidx.recyclerview.widget.LinearLayoutManager(getContext()));
+        rv.setAdapter(adapterPopUp);
+
+        // Hiển thị loading
+        pb.setVisibility(View.VISIBLE);
+        tvEmpty.setVisibility(View.GONE);
+
+        // Lấy dữ liệu từ sub-collection của User hiện tại
+        if (userId != null) {
+            db.collection("NguoiDung").document(userId).collection("ThongBaoNhacNho")
+                    .orderBy("ngayGui", Query.Direction.DESCENDING)
+                    .get()
+                    .addOnSuccessListener(queryDocumentSnapshots -> {
+                        if (!isAdded()) return;
+                        pb.setVisibility(View.GONE);
+                        if (!queryDocumentSnapshots.isEmpty()) {
+                            listPopUp.clear();
+                            listPopUp.addAll(queryDocumentSnapshots.toObjects(com.example.gymhome.model.ThongBao.class));
+                            adapterPopUp.notifyDataSetChanged();
+                            tvEmpty.setVisibility(View.GONE);
+                        } else {
+                            tvEmpty.setVisibility(View.VISIBLE);
+                        }
+                    })
+                    .addOnFailureListener(e -> {
+                        if (!isAdded()) return;
+                        pb.setVisibility(View.GONE);
+                        tvEmpty.setText("Lỗi: " + e.getMessage());
+                        tvEmpty.setVisibility(View.VISIBLE);
+                        Log.e("ThongBaoPopUp", "Error fetching data", e);
+                    });
+        } else {
+            pb.setVisibility(View.GONE);
+            tvEmpty.setVisibility(View.VISIBLE);
+        }
+
+        popupView.findViewById(R.id.ivDongPopUp).setOnClickListener(v -> popupWindow.dismiss());
+
+        // Hiển thị popup ngay dưới nút chuông
+        popupWindow.setElevation(20);
+        popupWindow.showAsDropDown(anchorView, -250, 10);
+    }
+
+    private void loadCanNangNguoiDung() {
+        if (userId == null) return;
+        db.collection("NguoiDung").document(userId).get()
+                .addOnSuccessListener(documentSnapshot -> {
+                    if (isAdded() && documentSnapshot.exists()) {
+                        Double canNangVal = documentSnapshot.getDouble("ThongTinNguoiDung.CanNang");
+                        if (canNangVal != null) {
+                            this.canNang = canNangVal;
+                            if (thuThachAdapter != null) {
+                                thuThachAdapter.setCanNang(this.canNang);
+                            }
+                        }
+                    }
+                });
     }
 
     private void syncLuuBaiViet() {

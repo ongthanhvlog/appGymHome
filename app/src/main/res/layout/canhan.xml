@@ -24,7 +24,7 @@
             android:id="@+id/titleCaNhan"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="35dp"
+            android:layout_marginTop="40dp"
             android:text="Cá Nhân"
             android:textColor="@android:color/white"
             android:textSize="28sp"

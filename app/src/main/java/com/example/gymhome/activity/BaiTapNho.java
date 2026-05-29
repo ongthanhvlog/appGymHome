@@ -304,7 +304,8 @@ public class BaiTapNho extends AppCompatActivity {
                 userRef.update(
                         "ThongTinNguoiDung.SoBaiTapHoanThanh", FieldValue.increment(1),
                         "ThongTinNguoiDung.TongCalo", FieldValue.increment(tongCaloBaiTap),
-                        "ThongTinNguoiDung.ThoiGianTapLuyen", FieldValue.increment(tongThoiGianBaiTap)
+                        "ThongTinNguoiDung.ThoiGianTapLuyen", FieldValue.increment(tongThoiGianBaiTap),
+                        "ThongTinNguoiDung.ngayTapGanNhat", FieldValue.serverTimestamp()
                 ).addOnSuccessListener(aVoid -> {
                     Toast.makeText(this, "Chúc mừng! Bạn đã hoàn thành bài tập!", Toast.LENGTH_LONG).show();
                     finish();

@@ -1,6 +1,8 @@
 package com.example.gymhome.model;
 
+import com.google.firebase.firestore.Exclude;
 import com.google.firebase.firestore.PropertyName;
+import com.google.gson.annotations.SerializedName;
 import java.io.Serializable;
 
 public class BaiViet implements Serializable {
@@ -13,6 +15,13 @@ public class BaiViet implements Serializable {
     private String linkBaiViet;
     private String linkLogo;
     private String tag;
+
+    // Các trường bổ sung cho API (Gộp từ Request/Response)
+    private transient boolean success;
+    private transient String reason;
+    private transient String docId;
+    @SerializedName("url")
+    private transient String apiUrl;
 
     public BaiViet() {}
 
@@ -106,6 +115,23 @@ public class BaiViet implements Serializable {
     public void setTag(String tag) {
         this.tag = tag;
     }
+
+    // Getter/Setter cho API
+    @Exclude
+    public boolean isSuccess() { return success; }
+    public void setSuccess(boolean success) { this.success = success; }
+
+    @Exclude
+    public String getReason() { return reason; }
+    public void setReason(String reason) { this.reason = reason; }
+
+    @Exclude
+    public String getDocId() { return docId; }
+    public void setDocId(String docId) { this.docId = docId; }
+
+    @Exclude
+    public String getApiUrl() { return apiUrl; }
+    public void setApiUrl(String apiUrl) { this.apiUrl = apiUrl; }
 
     public String getSourceName() {
         if (linkBaiViet == null || linkBaiViet.isEmpty()) return "GymHome";
