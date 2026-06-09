@@ -1,7 +1,7 @@
 package com.example.gymhome.model;
 
 public class GenericResponse {
-    private boolean success;
+    private boolean success; // trạng thái: true nếu thành công, false nếu không thành công
     private String message;
     private String error;
 

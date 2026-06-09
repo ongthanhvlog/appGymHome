@@ -73,6 +73,7 @@ public class TapLuyen_Fragment extends Fragment {
             intent.putExtra("NgayId", item.getId());
             intent.putExtra("CapDo", phanLoai);
             intent.putExtra("HinhAnhNgay", item.getHinhAnh());
+            intent.putExtra("MoTaNgay", item.getMoTa());
             startActivity(intent);
         });
         rvNgay.setAdapter(adapter);

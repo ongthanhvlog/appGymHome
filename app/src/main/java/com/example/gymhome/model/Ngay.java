@@ -1,5 +1,6 @@
 package com.example.gymhome.model;
 
+import com.google.firebase.firestore.PropertyName;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -25,42 +26,52 @@ public class Ngay implements Serializable {
     }
 
     // Getter và Setter
+    @PropertyName("Id")
     public String getId() {
         return Id;
     }
 
+    @PropertyName("Id")
     public void setId(String id) {
         Id = id;
     }
 
+    @PropertyName("TongThoiGian")
     public int getTongThoiGian() {
         return TongThoiGian;
     }
 
+    @PropertyName("TongThoiGian")
     public void setTongThoiGian(int tongThoiGian) {
         TongThoiGian = tongThoiGian;
     }
 
+    @PropertyName("SoLuongBaiTapLon")
     public int getSoLuongBaiTapLon() {
         return SoLuongBaiTapLon;
     }
 
+    @PropertyName("SoLuongBaiTapLon")
     public void setSoLuongBaiTapLon(int soLuongBaiTapLon) {
         SoLuongBaiTapLon = soLuongBaiTapLon;
     }
 
+    @PropertyName("HinhAnh")
     public String getHinhAnh() {
         return HinhAnh;
     }
 
+    @PropertyName("HinhAnh")
     public void setHinhAnh(String hinhAnh) {
         HinhAnh = hinhAnh;
     }
 
+    @PropertyName("MoTa")
     public String getMoTa() {
         return MoTa;
     }
 
+    @PropertyName("MoTa")
     public void setMoTa(String moTa) {
         MoTa = moTa;
     }

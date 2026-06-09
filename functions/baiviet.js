@@ -1,16 +1,13 @@
 const { onSchedule } = require("firebase-functions/v2/scheduler");
 const { onRequest } = require("firebase-functions/v2/https");
 const admin = require("firebase-admin");
-const axios = require("axios");
-const cheerio = require("cheerio");
-
-// --- Các hàm tiện ích bổ trợ cho Bài Viết ---
+const axios = require("axios"); // gửi request tải html từ url
+const cheerio = require("cheerio"); // phân tích html
 const headers = {
     'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
     'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8',
     'Accept-Language': 'vi-VN,vi;q=0.9,en-US;q=0.8,en;q=0.7',
 };
-
 const DOMAIN_NAME_MAP = {
     "baomoi.com": "Báo Mới"
 };
@@ -27,7 +24,7 @@ function lamSachNoiDung(text) {
     return cleaned;
 }
 
-function getSourceName(url) {
+function layTenNguon(url) {
     if (!url) return "";
     try {
         const hostname = new URL(url).hostname.replace("www.", "");
@@ -101,7 +98,6 @@ function layNgayDangBaiViet($bm) {
     }
     return new Date().toISOString();
 }
-// --- Kết thúc các hàm tiện ích ---
 
 let tuKhoaUuTienCao = [];
 let tuKhoaUuTienThap = [];
@@ -148,14 +144,14 @@ async function xuLyCapNhatBaiVietMoi() {
                     const data = tachNoiDungBaiViet(detailRes.data);
                     const $bm = cheerio.load(detailRes.data);
 
-                    let sourceName = data.originalUrl ? getSourceName(data.originalUrl) : "";
+                    let tenNguon = data.originalUrl ? layTenNguon(data.originalUrl) : "";
                     const ogSiteName = $bm('meta[property="og:site_name"]').attr('content');
-                    if (!sourceName || sourceName === "Báo Mới") {
+                    if (!tenNguon || tenNguon === "Báo Mới") {
                         if (ogSiteName && !ogSiteName.toLowerCase().includes("baomoi")) {
-                            sourceName = ogSiteName;
+                            tenNguon = ogSiteName;
                         }
                     }
-                    if (!sourceName) sourceName = "Báo Mới";
+                    if (!tenNguon) tenNguon = "Báo Mới";
 
                     let linkLogo = data.linkLogo;
                     if (!linkLogo) {
@@ -205,7 +201,7 @@ async function xuLyCapNhatBaiVietMoi() {
     return { count };
 }
 
-async function xyLyLinkBaiViet(baiVietUrl, tag) {
+async function xuLyLinkBaiViet(baiVietUrl, tag) {
     const db = admin.firestore();
     const cleanUrl = baiVietUrl.split('?')[0];
     const docId = Buffer.from(cleanUrl).toString('base64').substring(0, 40).replace(/[^a-zA-Z0-9]/g, '');
@@ -220,12 +216,12 @@ async function xyLyLinkBaiViet(baiVietUrl, tag) {
     const tenBaiViet = $bm('meta[property="og:title"]').attr('content') || $bm('title').text().trim() || cleanUrl;
     const moTa = $bm('meta[property="og:description"]').attr('content') || $bm('meta[name="description"]').attr('content') || tenBaiViet;
 
-    let sourceName = data.originalUrl ? getSourceName(data.originalUrl) : "";
+    let tenNguon = data.originalUrl ? layTenNguon(data.originalUrl) : "";
     const ogSiteName = $bm('meta[property="og:site_name"]').attr('content');
-    if (!sourceName || sourceName === "Báo Mới") {
-        if (ogSiteName && !ogSiteName.toLowerCase().includes("baomoi")) sourceName = ogSiteName;
+    if (!tenNguon || tenNguon === "Báo Mới") {
+        if (ogSiteName && !ogSiteName.toLowerCase().includes("baomoi")) tenNguon = ogSiteName;
     }
-    if (!sourceName) sourceName = "Báo Mới";
+    if (!tenNguon) tenNguon = "Báo Mới";
 
     let linkLogo = data.linkLogo;
     if (!linkLogo) {
@@ -276,17 +272,17 @@ async function xoaBaiVietCu() {
     if (snapshot.empty) return 0;
 
     const batch = db.batch();
-    let deletedCount = 0;
+    let soBaiVietDaXoa = 0;
     snapshot.docs.forEach(doc => {
         const data = doc.data();
         if (data.trangThai !== 1) {
             batch.delete(doc.ref);
-            deletedCount++;
+            soBaiVietDaXoa++;
         }
     });
 
-    if (deletedCount > 0) await batch.commit();
-    return deletedCount;
+    if (soBaiVietDaXoa > 0) await batch.commit();
+    return soBaiVietDaXoa;
 }
 
 exports.triggerCapNhatBaiVietMoi = onRequest({ timeoutSeconds: 300, memory: "512MiB", cors: true }, async (req, res) => {
@@ -298,7 +294,7 @@ exports.themBaiVietTuLink = onRequest({ timeoutSeconds: 60, memory: "256MiB", co
         const url = req.query.url || req.body?.url;
         const tag = req.query.tag || req.body?.tag || "suckhoe";
         if (!url) return res.status(400).json({ success: false, reason: "Thiếu tham số url" });
-        const result = await xyLyLinkBaiViet(url, tag);
+        const result = await xuLyLinkBaiViet(url, tag);
         if (result.success) res.status(200).json(result);
         else if (result.reason === "existed") res.status(409).json(result);
         else res.status(500).json(result);

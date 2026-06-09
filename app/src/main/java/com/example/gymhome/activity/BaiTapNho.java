@@ -229,6 +229,12 @@ public class BaiTapNho extends AppCompatActivity {
             exoPlayer.setMediaItem(MediaItem.fromUri(Uri.parse(duongDanVideo)));
             exoPlayer.prepare();
             exoPlayer.play();
+            
+            // Tải trước video tiếp theo
+            if (viTri + 1 < danhSachBaiTapNho.size()) {
+                String nextVideoUrl = danhSachBaiTapNho.get(viTri + 1).getVideoHuongDan();
+                VideoCacheManager.preCacheVideo(this, nextVideoUrl);
+            }
         } else {
             videoProgressBar.setVisibility(View.GONE);
             batDauDemNguoc();

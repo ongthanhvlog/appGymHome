@@ -90,7 +90,6 @@ public class ChamSocKhachHangAdapter extends RecyclerView.Adapter<ChamSocKhachHa
             holder.layoutPhanHoi.setVisibility(View.GONE);
         }
 
-        // Sự kiện nút Hủy
         holder.btnHuyYeuCau.setOnClickListener(v -> {
             new AlertDialog.Builder(context)
                     .setTitle("Xác nhận hủy")

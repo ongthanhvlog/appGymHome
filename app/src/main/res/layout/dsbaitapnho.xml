@@ -85,13 +85,13 @@
         app:layout_constraintBottom_toBottomOf="parent">
 
         <Button
-            android:id="@+id/btnCaiDatTapLuyen"
+            android:id="@+id/btnSapXep"
             style="@style/Widget.MaterialComponents.Button.OutlinedButton"
             android:layout_width="0dp"
             android:layout_height="56dp"
             android:layout_marginEnd="8dp"
             android:layout_weight="1"
-            android:text="Cài đặt"
+            android:text="Sắp xếp"
             android:textAllCaps="false"
             app:cornerRadius="28dp" />
 

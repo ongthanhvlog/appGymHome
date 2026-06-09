@@ -1,5 +1,6 @@
 package com.example.gymhome.model;
 
+import com.google.firebase.firestore.PropertyName;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
@@ -28,25 +29,39 @@ public class BaiTapLon implements Serializable {
     }
 
     // Getter và Setter
+    @PropertyName("Id")
     public String getId() { return Id; }
+    @PropertyName("Id")
     public void setId(String id) { Id = id; }
 
+    @PropertyName("TenBaiTapLon")
     public String getTenBaiTapLon() { return TenBaiTapLon; }
+    @PropertyName("TenBaiTapLon")
     public void setTenBaiTapLon(String tenBaiTapLon) { TenBaiTapLon = tenBaiTapLon; }
 
+    @PropertyName("CapDo")
     public String getCapDo() { return CapDo; }
+    @PropertyName("CapDo")
     public void setCapDo(String capDo) { CapDo = capDo; }
 
+    @PropertyName("TongThoiGian")
     public int getTongThoiGian() { return TongThoiGian; }
+    @PropertyName("TongThoiGian")
     public void setTongThoiGian(int tongThoiGian) { TongThoiGian = tongThoiGian; }
 
+    @PropertyName("HinhAnh")
     public String getHinhAnh() { return HinhAnh; }
+    @PropertyName("HinhAnh")
     public void setHinhAnh(String hinhAnh) { HinhAnh = hinhAnh; }
 
+    @PropertyName("MoTa")
     public String getMoTa() { return MoTa; }
+    @PropertyName("MoTa")
     public void setMoTa(String moTa) { MoTa = moTa; }
 
+    @PropertyName("SoLuongBaiTapNho")
     public int getSoLuongBaiTapNho() { return SoLuongBaiTapNho; }
+    @PropertyName("SoLuongBaiTapNho")
     public void setSoLuongBaiTapNho(int soLuongBaiTapNho) { SoLuongBaiTapNho = soLuongBaiTapNho; }
 
     public List<BaiTapNho> getDanhSachBaiTapNho() { return danhSachBaiTapNho; }
