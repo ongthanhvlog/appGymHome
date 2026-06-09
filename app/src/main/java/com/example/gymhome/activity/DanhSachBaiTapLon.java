@@ -29,7 +29,7 @@ public class DanhSachBaiTapLon extends AppCompatActivity {
 
     private ImageButton ibQuayLai;
     private ImageView imgHinhAnhBaiTapLon;
-    private TextView tvNgay;
+    private TextView tvNgay, tvMoTa;
     private RecyclerView rvBaiTapLon;
     private BaiTapLonAdapter adapter;
     private List<com.example.gymhome.model.BaiTapLon> danhSachBaiTapLon;
@@ -53,16 +53,22 @@ public class DanhSachBaiTapLon extends AppCompatActivity {
         ngayId = getIntent().getStringExtra("NgayId");
         capDo = getIntent().getStringExtra("CapDo");
         String hinhAnhNgay = getIntent().getStringExtra("HinhAnhNgay");
+        String moTaNgay = getIntent().getStringExtra("MoTaNgay");
 
         // anh xa id
         ibQuayLai = findViewById(R.id.ibQuayLai);
         imgHinhAnhBaiTapLon = findViewById(R.id.imgHinhAnhBaiTapLon);
         tvNgay = findViewById(R.id.tvNgay);
+        tvMoTa = findViewById(R.id.tvMoTa);
         rvBaiTapLon = findViewById(R.id.rvBaiTapLon);
 
         if (ngayId != null) {
             String displayNgay = ngayId.replace("ngay_", "Ngày ");
             tvNgay.setText(displayNgay);
+        }
+
+        if (moTaNgay != null && !moTaNgay.isEmpty()) {
+            tvMoTa.setText(moTaNgay);
         }
         // hien thi hinh anh cua ngay vao header
         Glide.with(this)

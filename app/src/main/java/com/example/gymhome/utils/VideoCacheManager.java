@@ -1,12 +1,16 @@
 package com.example.gymhome.utils;
 
 import android.content.Context;
+import android.net.Uri;
+
 import androidx.annotation.OptIn;
 import androidx.media3.common.util.UnstableApi;
 import androidx.media3.datasource.DataSource;
+import androidx.media3.datasource.DataSpec;
 import androidx.media3.datasource.DefaultDataSource;
 import androidx.media3.datasource.DefaultHttpDataSource;
 import androidx.media3.datasource.cache.CacheDataSource;
+import androidx.media3.datasource.cache.CacheWriter;
 import androidx.media3.datasource.cache.LeastRecentlyUsedCacheEvictor;
 import androidx.media3.datasource.cache.SimpleCache;
 import java.io.File;
@@ -43,5 +47,25 @@ public class VideoCacheManager {
             );
         }
         return sDownloadCache;
+    }
+
+    public static void preCacheVideo(Context context, String url) {
+        if (url == null || url.isEmpty() || !url.startsWith("http")) return;
+
+        new Thread(() -> {
+            try {
+                Uri uri = Uri.parse(url);
+                DataSpec dataSpec = new DataSpec(uri);
+                CacheWriter cacheWriter = new CacheWriter(
+                        getCacheDataSourceFactory(context.getApplicationContext()).createDataSource(),
+                        dataSpec,
+                        null,
+                        null
+                );
+                cacheWriter.cache();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }).start();
     }
 }

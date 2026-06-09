@@ -3,15 +3,12 @@ const { onRequest } = require("firebase-functions/v2/https");
 const admin = require("firebase-admin");
 const moment = require("moment-timezone");
 
-// Khởi tạo admin nếu chưa có
+// Khởi tạo admin
 if (!admin.apps.length) {
     admin.initializeApp();
 }
 
-/**
- * Lưu thông báo vào sub-collection của người dùng để hiển thị trong app
- */
-async function luuVaoThongBaoCaNhan(userId, tieuDe, noiDung) {
+async function luuThongBaoNhacNho(userId, tieuDe, noiDung) {
     const db = admin.firestore();
     try {
         await db.collection("NguoiDung").doc(userId).collection("ThongBaoNhacNho").add({
@@ -24,9 +21,7 @@ async function luuVaoThongBaoCaNhan(userId, tieuDe, noiDung) {
     }
 }
 
-/**
- * API gửi thông báo từ hệ thống (Web Admin)
- */
+//API gửi thông báo từ hệ thống (Web Admin)
 exports.guiThongBaoHeThong = onRequest({ cors: true }, async (req, res) => {
     const db = admin.firestore();
     const userId = req.body?.userId || req.query.userId;
@@ -70,7 +65,7 @@ exports.guiThongBaoHeThong = onRequest({ cors: true }, async (req, res) => {
                     token: userDoc.data().fcmToken
                 });
             }
-            await luuVaoThongBaoCaNhan(userId, tieuDe, noiDung);
+            await luuThongBaoNhacNho(userId, tieuDe, noiDung);
             return res.status(200).json({ success: true, message: `Đã gửi và lưu thông báo cho user ${userId}` });
         } else {
             const snapshot = await db.collection("NguoiDung").get();
@@ -82,7 +77,7 @@ exports.guiThongBaoHeThong = onRequest({ cors: true }, async (req, res) => {
                 if (userData.fcmToken) {
                     messages.push({ notification: { title: tieuDe, body: noiDung }, token: userData.fcmToken });
                 }
-                savePromises.push(luuVaoThongBaoCaNhan(doc.id, tieuDe, noiDung));
+                savePromises.push(luuThongBaoNhacNho(doc.id, tieuDe, noiDung));
             });
 
             if (messages.length > 0) {
@@ -99,20 +94,16 @@ exports.guiThongBaoHeThong = onRequest({ cors: true }, async (req, res) => {
     }
 });
 
-/**
- * Hàm chạy tự động mỗi phút để gửi các thông báo đến hạn
- */
 exports.tuDongGuiThongBaoHenGio = onSchedule({
     schedule: "every 1 minutes",
     timeZone: "Asia/Ho_Chi_Minh"
 }, async (event) => {
     const db = admin.firestore();
-    const bayGio = admin.firestore.Timestamp.now();
+    const thoiGianHienTai = admin.firestore.Timestamp.now();
+    const fcmQueueSnap = await db.collection("ThongBao").where("ngayGui", "<=", thoiGianHienTai).get();
+    const thongBaoMoiNgaySnap = await db.collection("ThongBaoMoiNgay").where("trangThai", "==", 1).get();
 
-    const fcmQueueSnap = await db.collection("ThongBao").where("ngayGui", "<=", bayGio).get();
-    const moiNgaySnap = await db.collection("ThongBaoMoiNgay").where("trangThai", "==", 1).get();
-
-    if (fcmQueueSnap.empty && moiNgaySnap.empty) return;
+    if (fcmQueueSnap.empty && thongBaoMoiNgaySnap.empty) return;
 
     const usersSnap = await db.collection("NguoiDung").get();
     const users = [];
@@ -132,25 +123,25 @@ exports.tuDongGuiThongBaoHenGio = onSchedule({
                 if (user.fcmToken) {
                     messagesToSend.push({ notification: { title: data.tieuDe, body: data.noiDung }, token: user.fcmToken });
                 }
-                savePromises.push(luuVaoThongBaoCaNhan(user.id, data.tieuDe, data.noiDung));
+                savePromises.push(luuThongBaoNhacNho(user.id, data.tieuDe, data.noiDung));
             }
         }
         deletePromises.push(doc.ref.delete());
     });
 
     // XỬ LÝ TIN MỖI NGÀY
-    for (const mDoc of moiNgaySnap.docs) {
-        const mData = mDoc.data();
+    for (const doc of thongBaoMoiNgaySnap.docs) {
+        const data = doc.data();
 
         for (const user of users) {
             const userTz = user.timezone || "Asia/Ho_Chi_Minh";
-            const userLocalTime = moment().tz(userTz).format("HH:mm");
+            const thoiGianHienTaiUser = moment().tz(userTz).format("HH:mm");
 
-            if (userLocalTime === mData.thoiGian) {
+            if (thoiGianHienTaiUser === data.thoiGian) {
                 if (user.fcmToken) {
-                    messagesToSend.push({ notification: { title: mData.tieuDe, body: mData.noiDung }, token: user.fcmToken });
+                    messagesToSend.push({ notification: { title: data.tieuDe, body: data.noiDung }, token: user.fcmToken });
                 }
-                savePromises.push(luuVaoThongBaoCaNhan(user.id, mData.tieuDe, mData.noiDung));
+                savePromises.push(luuThongBaoNhacNho(user.id, data.tieuDe, data.noiDung));
             }
         }
     }
@@ -166,9 +157,8 @@ exports.tuDongGuiThongBaoHenGio = onSchedule({
 });
 
  //Tự động nhắc nhở người dùng tập luyện nếu họ nghỉ quá 3 ngày
- // Chạy vào 8:00 sáng mỗi ngày
 exports.nhacNhoTapLuyenTuDong = onSchedule({
-    schedule: "0 8 * * *",
+    schedule: "0 8 * * *", // chạy vào 8h sáng mỗi ngày
     timeZone: "Asia/Ho_Chi_Minh"
 }, async (event) => {
     const db = admin.firestore();
@@ -179,21 +169,22 @@ exports.nhacNhoTapLuyenTuDong = onSchedule({
 
         usersSnap.forEach(doc => {
             const userData = doc.data();
-            const thongTin = userData.ThongTinNguoiDung;
+            const thongTinTapLuyen = userData.ThongTinNguoiDung;
 
             // Lấy múi giờ của riêng User, nếu không có thì dùng mặc định VN
             const userTz = userData.timezone || "Asia/Ho_Chi_Minh";
-            const bayGioUser = moment().tz(userTz);
+            const thoiGianHienTaiUser = moment().tz(userTz);
 
-            if (thongTin && thongTin.ngayTapGanNhat) {
-                const ngayTapGanNhat = moment(thongTin.ngayTapGanNhat.toDate()).tz(userTz);
+            if (thongTinTapLuyen && thongTinTapLuyen.ngayTapGanNhat) {
+                const rawDate = thongTinTapLuyen.ngayTapGanNhat.toDate ? thongTinTapLuyen.ngayTapGanNhat.toDate() : thongTinTapLuyen.ngayTapGanNhat;
+                const ngayTapGanNhatMoment = moment(rawDate).tz(userTz);
+                const soNgayNghiTap = thoiGianHienTaiUser.clone().startOf('day').diff(ngayTapGanNhatMoment.clone().startOf('day'), 'days');
 
-                // Tính toán số ngày chênh lệch
-                const diffDays = bayGioUser.startOf('day').diff(ngayTapGanNhat.startOf('day'), 'days');
-
-                if (diffDays >= 3) {
+                if (soNgayNghiTap >= 3) {
                     const tieuDe = "GymHome Nhắc Nhở Tập Luyện 🏋️‍♂️";
-                    const noiDung = `Đã ${diffDays} ngày rồi bạn chưa luyện tập, hãy quay lại tập cùng GymHome nhé! 💪`;
+                    const noiDung = `Đã ${soNgayNghiTap} ngày rồi bạn chưa luyện tập, hãy quay lại tập cùng GymHome nhé! 💪`;
+
+                    console.log(`[Nhắc nhở] Gửi cho user ${doc.id} (Nghỉ ${soNgayNghiTap} ngày)`);
 
                     if (userData.fcmToken) {
                         messagesToSend.push({
@@ -201,7 +192,7 @@ exports.nhacNhoTapLuyenTuDong = onSchedule({
                             token: userData.fcmToken,
                         });
                     }
-                    savePromises.push(luuVaoThongBaoCaNhan(doc.id, tieuDe, noiDung));
+                    savePromises.push(luuThongBaoNhacNho(doc.id, tieuDe, noiDung));
                 }
             }
         });

@@ -13,6 +13,8 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
+import androidx.annotation.NonNull;
+import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -30,7 +32,7 @@ import java.util.List;
 
 public class DanhSachBaiTapNho extends AppCompatActivity {
     private ImageButton ibQuayLai;
-    private Button btnCaiDatTapLuyen, btnBatDauTapLuyen;
+    private Button btnSapXep, btnBatDauTapLuyen;
     private ImageView imgHinhAnhBaiTapLon;
     private TextView tvTenBaiTapLon, tvMoTa;
     private RecyclerView rvBaiTapNho;
@@ -42,6 +44,8 @@ public class DanhSachBaiTapNho extends AppCompatActivity {
     
     private String capDo, ngayId, baiTapLonId;
     private boolean isRegistered = false;
+    private boolean isSortingMode = false;
+    private ItemTouchHelper itemTouchHelper;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,7 +75,7 @@ public class DanhSachBaiTapNho extends AppCompatActivity {
 
         // anh xa id
         ibQuayLai = findViewById(R.id.ibQuayLai);
-        btnCaiDatTapLuyen = findViewById(R.id.btnCaiDatTapLuyen);
+        btnSapXep = findViewById(R.id.btnSapXep);
         btnBatDauTapLuyen = findViewById(R.id.btnBatDauTapLuyen);
         imgHinhAnhBaiTapLon = findViewById(R.id.imgHinhAnhBaiTapLon);
         tvTenBaiTapLon = findViewById(R.id.tvTenBaiTapLon);
@@ -88,9 +92,8 @@ public class DanhSachBaiTapNho extends AppCompatActivity {
         danhSachBaiTapNho = new ArrayList<>();
         rvBaiTapNho.setLayoutManager(new LinearLayoutManager(this));
 
-        loadCanNangNguoiDung();
-        
         adapter = new BaiTapNhoAdapter(danhSachBaiTapNho, canNang, item -> {
+            if (isSortingMode) return; // Không cho phép click khi đang sắp xếp
             int position = danhSachBaiTapNho.indexOf(item);
             Intent intent = new Intent(DanhSachBaiTapNho.this, com.example.gymhome.activity.BaiTapNho.class);
             intent.putExtra("DanhSachBaiTap", (ArrayList<BaiTapNho>) danhSachBaiTapNho);
@@ -99,8 +102,46 @@ public class DanhSachBaiTapNho extends AppCompatActivity {
         });
         rvBaiTapNho.setAdapter(adapter);
 
+        loadCanNangNguoiDung();
+
+        // Khởi tạo ItemTouchHelper để sắp xếp
+        itemTouchHelper = new ItemTouchHelper(new ItemTouchHelper.SimpleCallback(ItemTouchHelper.UP | ItemTouchHelper.DOWN, 0) {
+            @Override
+            public boolean onMove(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder, @NonNull RecyclerView.ViewHolder target) {
+                int fromPosition = viewHolder.getAdapterPosition();
+                int toPosition = target.getAdapterPosition();
+                java.util.Collections.swap(danhSachBaiTapNho, fromPosition, toPosition);
+                adapter.notifyItemMoved(fromPosition, toPosition);
+                return true;
+            }
+
+            @Override
+            public void onSwiped(@NonNull RecyclerView.ViewHolder viewHolder, int direction) {}
+
+            @Override
+            public boolean isLongPressDragEnabled() {
+                return isSortingMode;
+            }
+        });
+        itemTouchHelper.attachToRecyclerView(rvBaiTapNho);
+
         // xu ly click
         ibQuayLai.setOnClickListener(v -> finish());
+        btnSapXep.setOnClickListener(v -> {
+            if (!isSortingMode) {
+                isSortingMode = true;
+                btnSapXep.setText("Xong");
+                Toast.makeText(this, "Nhấn giữ và kéo để sắp xếp bài tập", Toast.LENGTH_SHORT).show();
+            } else {
+                isSortingMode = false;
+                btnSapXep.setText("Sắp xếp");
+                Toast.makeText(this, "Đã lưu thứ tự sắp xếp", Toast.LENGTH_SHORT).show();
+                // Cập nhật lại số thứ tự trong danh sách nếu cần
+                for (int i = 0; i < danhSachBaiTapNho.size(); i++) {
+                    danhSachBaiTapNho.get(i).setSoThuTu(i + 1);
+                }
+            }
+        });
         btnBatDauTapLuyen.setOnClickListener(v -> {
             if (!danhSachBaiTapNho.isEmpty()) {
                 Intent intent = new Intent(DanhSachBaiTapNho.this, com.example.gymhome.activity.BaiTapNho.class);
@@ -128,14 +169,9 @@ public class DanhSachBaiTapNho extends AppCompatActivity {
                         Double canNangVal = documentSnapshot.getDouble("ThongTinNguoiDung.CanNang");
                         if (canNangVal != null) {
                             this.canNang = canNangVal;
-                            adapter = new BaiTapNhoAdapter(danhSachBaiTapNho, this.canNang, item -> {
-                                int position = danhSachBaiTapNho.indexOf(item);
-                                Intent intent = new Intent(DanhSachBaiTapNho.this, com.example.gymhome.activity.BaiTapNho.class);
-                                intent.putExtra("DanhSachBaiTap", (ArrayList<BaiTapNho>) danhSachBaiTapNho);
-                                intent.putExtra("ViTriHienTai", position);
-                                startActivity(intent);
-                            });
-                            rvBaiTapNho.setAdapter(adapter);
+                            if (adapter != null) {
+                                adapter.setCanNang(this.canNang);
+                            }
                         }
                     }
                 });

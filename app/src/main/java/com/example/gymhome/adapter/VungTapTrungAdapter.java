@@ -10,6 +10,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.example.gymhome.R;
 import com.example.gymhome.model.VungTapTrung;
 
@@ -43,6 +44,7 @@ public class VungTapTrungAdapter extends RecyclerView.Adapter<VungTapTrungAdapte
         
         Glide.with(holder.itemView.getContext())
                 .load(item.getHinhAnh())
+                .diskCacheStrategy(DiskCacheStrategy.ALL)
                 .placeholder(R.drawable.ic_launcher_background)
                 .into(holder.ivHinhAnh);
 

@@ -1,5 +1,6 @@
 package com.example.gymhome.model;
 
+import com.google.firebase.firestore.PropertyName;
 import java.io.Serializable;
 
 public class BaiTapNho implements Serializable {
@@ -29,74 +30,92 @@ public class BaiTapNho implements Serializable {
     }
 
     // Getter và Setter
+    @PropertyName("Id")
     public String getId() {
         return Id;
     }
 
+    @PropertyName("Id")
     public void setId(String id) {
         Id = id;
     }
 
+    @PropertyName("TenBaiTapNho")
     public String getTenBaiTapNho() {
         return TenBaiTapNho;
     }
 
+    @PropertyName("TenBaiTapNho")
     public void setTenBaiTapNho(String tenBaiTapNho) {
         TenBaiTapNho = tenBaiTapNho;
     }
 
+    @PropertyName("MoTa")
     public String getMoTa() {
         return MoTa;
     }
 
+    @PropertyName("MoTa")
     public void setMoTa(String moTa) {
         MoTa = moTa;
     }
 
+    @PropertyName("ThoiGian")
     public int getThoiGian() {
         return ThoiGian;
     }
 
+    @PropertyName("ThoiGian")
     public void setThoiGian(int thoiGian) {
         ThoiGian = thoiGian;
     }
 
+    @PropertyName("MET")
     public double getMET() {
         return MET;
     }
 
+    @PropertyName("MET")
     public void setMET(double MET) {
         this.MET = MET;
     }
 
+    @PropertyName("SoThuTu")
     public int getSoThuTu() {
         return SoThuTu;
     }
 
+    @PropertyName("SoThuTu")
     public void setSoThuTu(int soThuTu) {
         SoThuTu = soThuTu;
     }
 
+    @PropertyName("VideoHuongDan")
     public String getVideoHuongDan() {
         return VideoHuongDan;
     }
 
+    @PropertyName("VideoHuongDan")
     public void setVideoHuongDan(String videoHuongDan) {
         VideoHuongDan = videoHuongDan;
     }
 
+    @PropertyName("VideoType")
     public String getVideoType() {
         return VideoType;
     }
 
+    @PropertyName("VideoType")
     public void setVideoType(String videoType) {
         VideoType = videoType;
     }
 
+    @PropertyName("HinhAnh")
     public String getHinhAnh() {
         return HinhAnh;
     }
 
+    @PropertyName("HinhAnh")
     public void setHinhAnh(String hinhAnh) {
         HinhAnh = hinhAnh;
     }

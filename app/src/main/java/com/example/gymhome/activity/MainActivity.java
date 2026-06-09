@@ -23,9 +23,12 @@ import com.example.gymhome.fragment.CaNhan_Fragment;
 import com.example.gymhome.fragment.DinhDuong_Fragment;
 import com.example.gymhome.fragment.TapLuyen_Fragment;
 import com.example.gymhome.fragment.TrangChu_Fragment;
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.SetOptions;
 import com.google.firebase.messaging.FirebaseMessaging;
@@ -51,6 +54,14 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        
+        // Bật tính năng lưu trữ ngoại tuyến cho Firestore để load dữ liệu nhanh hơn
+        com.google.firebase.firestore.FirebaseFirestore db = com.google.firebase.firestore.FirebaseFirestore.getInstance();
+        com.google.firebase.firestore.FirebaseFirestoreSettings settings = new com.google.firebase.firestore.FirebaseFirestoreSettings.Builder()
+                .setPersistenceEnabled(true)
+                .build();
+        db.setFirestoreSettings(settings);
+
         setContentView(R.layout.activity_main);
         bottomNavigationView = findViewById(R.id.bottom_navigation);
 
@@ -77,6 +88,7 @@ public class MainActivity extends AppCompatActivity {
 
         // Mặc định mở Trang Chủ
         loadFragment(new TrangChu_Fragment());
+        preLoadAppData();
 
         bottomNavigationView.setOnItemSelectedListener(item -> {
             Fragment fragment = null;
@@ -167,6 +179,38 @@ public class MainActivity extends AppCompatActivity {
             return true;
         }
         return false;
+    }
+
+    private void preLoadAppData() {
+        FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+        db.collection("VungTapTrung").get();
+        db.collection("ThuThach").limit(10).get();
+        db.collection("BaiViet").limit(10).get();
+
+        db.collection("VungTapTrung").get().addOnSuccessListener(snapshots -> {
+            for (DocumentSnapshot doc : snapshots) {
+                String url = doc.getString("hinhAnh");
+                if (url != null && !url.isEmpty()) {
+                    Glide.with(getApplicationContext())
+                            .load(url)
+                            .diskCacheStrategy(DiskCacheStrategy.ALL)
+                            .preload();
+                }
+            }
+        });
+
+        db.collection("ThuThach").limit(5).get().addOnSuccessListener(snapshots -> {
+            for (DocumentSnapshot doc : snapshots) {
+                String url = doc.getString("hinhAnh");
+                if (url != null && !url.isEmpty()) {
+                    Glide.with(getApplicationContext())
+                            .load(url)
+                            .diskCacheStrategy(DiskCacheStrategy.ALL)
+                            .preload();
+                }
+            }
+        });
     }
 
 }
